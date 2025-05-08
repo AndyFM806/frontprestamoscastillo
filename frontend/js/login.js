@@ -7,8 +7,11 @@ document.getElementById("login-form").addEventListener("submit", async function 
     const response = await fetch("https://backpracticaagile.onrender.com/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: usuario, password: clave }),
-    });
+      body: JSON.stringify({
+        username: usuario,
+        password: clave
+      }),
+          });
 
     if (response.ok) {
       sessionStorage.setItem("usuario", usuario);
