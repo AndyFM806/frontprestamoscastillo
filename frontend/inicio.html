@@ -39,20 +39,22 @@
             <button id="consultar-btn">Consultar</button>
           </div>
 
-          <!-- Fragmento corregido de tu HTML -->
-          <!-- Dentro del div id="datos-cliente" -->
-
+          <!-- Dentro de tu archivo HTML existente -->
           <div id="datos-cliente">
-            <!-- Campo único reutilizado para nombre o razón social -->
-            <label id="label-nombre" for="nombre">Nombres</label>
+            <label for="nombre">Nombre / Razón Social</label>
             <input type="text" id="nombre" readonly />
 
-            <!-- Apellidos solo visible si es DNI -->
-            <div id="dni-extra" style="display: block;">
+            <div id="dni-extra" style="display: none;">
               <label for="apellido">Apellidos</label>
               <input type="text" id="apellido" readonly />
             </div>
+
+            <div id="ruc-extra" style="display: none;">
+              <label for="direccion">Dirección</label>
+              <input type="text" id="direccion" readonly />
+            </div>
           </div>
+
         <!-- Registro de préstamo -->
         <div class="form-section">
           <label for="monto">Monto del préstamo</label>
