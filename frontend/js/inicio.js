@@ -3,8 +3,12 @@ let clienteConsultado = null;
 
 document.getElementById("tipo-doc").addEventListener("change", function () {
   const tipo = this.value;
-  document.getElementById("dni-extra").style.display = tipo === "DNI" ? "block" : "none";
-  document.getElementById("ruc-extra").style.display = tipo === "RUC" ? "block" : "none";
+  const dniExtra = document.getElementById("dni-extra");
+  const rucExtra = document.getElementById("ruc-extra");
+
+if (dniExtra) dniExtra.style.display = tipo === "DNI" ? "block" : "none";
+if (rucExtra) rucExtra.style.display = tipo === "RUC" ? "block" : "none";
+
   // Limpiar campos al cambiar tipo
   document.getElementById("nombre").value = "";
   document.getElementById("apellido").value = "";
@@ -36,9 +40,10 @@ document.getElementById("consultar-btn").addEventListener("click", async () => {
       document.getElementById("direccion").value = data.direccion || "";
     }
   } catch (err) {
-    alert("Cliente no encontrado.");
+    alert("Cliente no encontrado.\n" + err.message);
     clienteConsultado = null;
   }
+  
 });
 
 // Registrar préstamo
