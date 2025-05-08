@@ -1,6 +1,24 @@
 const API_URL = "https://backpracticaagile.onrender.com/api";
 let clienteConsultado = null;
 
+// Cambia visibilidad de campos al cambiar tipo de documento
+document.getElementById("tipo-doc").addEventListener("change", () => {
+  const tipo = document.getElementById("tipo-doc").value;
+
+  if (tipo === "DNI") {
+    document.getElementById("label-nombre").innerText = "Nombre";
+    document.getElementById("dni-extra").style.display = "block";
+    document.getElementById("nombre").value = "";
+    document.getElementById("apellido").value = "";
+  } else {
+    document.getElementById("label-nombre").innerText = "Razón Social";
+    document.getElementById("dni-extra").style.display = "none";
+    document.getElementById("nombre").value = "";
+    document.getElementById("apellido").value = "";
+  }
+});
+
+// Consultar datos del cliente
 document.getElementById("consultar-btn").addEventListener("click", async () => {
   const tipoDoc = document.getElementById("tipo-doc").value;
   const numero = document.getElementById("numero-doc").value.trim();
@@ -16,8 +34,7 @@ document.getElementById("consultar-btn").addEventListener("click", async () => {
     const data = await res.json();
     clienteConsultado = data;
 
-    document.getElementById("nombre").value = data.nombre;
-    document.getElementById("direccion").value = data.direccion || "-";
+    document.getElementById("nombre").value = data.nombre || data.razonSocial || "-";
 
     if (tipoDoc === "DNI") {
       document.getElementById("apellido").value = data.apellido || "-";
@@ -32,6 +49,7 @@ document.getElementById("consultar-btn").addEventListener("click", async () => {
   }
 });
 
+// Registrar préstamo
 document.getElementById("registrar-btn").addEventListener("click", async () => {
   if (!clienteConsultado) return alert("Debe consultar un cliente primero.");
 
@@ -46,7 +64,7 @@ document.getElementById("registrar-btn").addEventListener("click", async () => {
     return alert("El número de cuotas debe estar entre 1 y 36.");
   }
 
-  // Validar límite mensual con API
+  // Validar límite mensual
   try {
     const respuesta = await fetch(`${API_URL}/prestamos/totales/${clienteConsultado.dniRuc}`);
     const json = await respuesta.json();
