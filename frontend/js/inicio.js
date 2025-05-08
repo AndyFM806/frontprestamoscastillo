@@ -5,6 +5,10 @@ document.getElementById("tipo-doc").addEventListener("change", function () {
   const tipo = this.value;
   document.getElementById("dni-extra").style.display = tipo === "DNI" ? "block" : "none";
   document.getElementById("ruc-extra").style.display = tipo === "RUC" ? "block" : "none";
+  // Limpiar campos al cambiar tipo
+  document.getElementById("nombre").value = "";
+  document.getElementById("apellido").value = "";
+  document.getElementById("direccion").value = "";
 });
 
 document.getElementById("consultar-btn").addEventListener("click", async () => {
@@ -12,6 +16,7 @@ document.getElementById("consultar-btn").addEventListener("click", async () => {
   const numero = document.getElementById("numero-doc").value.trim();
 
   if (!numero) return alert("Ingrese un número de documento.");
+
   const endpoint = `/clientes/buscar/${numero}`;
 
   try {
@@ -21,14 +26,21 @@ document.getElementById("consultar-btn").addEventListener("click", async () => {
     const data = await res.json();
     clienteConsultado = data;
 
-    document.getElementById("nombre").value = data.nombre;
-    document.getElementById("apellido").value = tipoDoc === "DNI" ? data.apellido : "";
-    document.getElementById("direccion").value = tipoDoc === "RUC" ? data.direccion : "";
+    if (tipoDoc === "DNI") {
+      document.getElementById("nombre").value = data.nombre || "";
+      document.getElementById("apellido").value = data.apellido || "";
+      document.getElementById("direccion").value = "";
+    } else {
+      document.getElementById("nombre").value = data.nombre || "";
+      document.getElementById("apellido").value = "";
+      document.getElementById("direccion").value = data.direccion || "";
+    }
   } catch (err) {
     alert("Cliente no encontrado.");
     clienteConsultado = null;
   }
 });
+
 // Registrar préstamo
 document.getElementById("registrar-btn").addEventListener("click", async () => {
   if (!clienteConsultado) return alert("Debe consultar un cliente primero.");
