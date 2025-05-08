@@ -1,0 +1,24 @@
+document.getElementById("login-form").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const usuario = document.getElementById("usuario").value;
+    const clave = document.getElementById("clave").value;
+  
+    try {
+      const response = await fetch("https://backpracticaagile.onrender.com/api/usuarios/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ usuario, clave }),
+      });
+  
+      if (response.ok) {
+        sessionStorage.setItem("usuario", usuario);
+        window.location.href = "inicio.html";
+      } else {
+        alert("Credenciales incorrectas");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error de conexión");
+    }
+  });
+  

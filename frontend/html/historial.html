@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Historial de Préstamos</title>
+  <link rel="stylesheet" href="../css/inicio.css" />
+  <link rel="stylesheet" href="../css/historial.css" />
+</head>
+<body>
+  <div class="layout">
+    <!-- Menú lateral compartido -->
+    <aside class="sidebar">
+      <h2 class="logo">Préstamos Castillo</h2>
+      <nav>
+        <ul>
+          <li><a href="inicio.html">🏠 Inicio</a></li>
+          <li class="active"><a href="historial.html">📄 Historial</a></li>
+          <li><a href="configuracion.html">⚙️ Configuraciones</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Contenido principal -->
+    <main class="main">
+      <h1>Historial de Préstamos</h1>
+
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>DNI/RUC</th>
+              <th>Nombre / Razón Social</th>
+              <th>Fecha</th>
+              <th>Monto</th>
+              <th>Cronograma</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-historial">
+            <!-- Datos cargados por JS -->
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/historial.js"></script>
+</body>
+</html>

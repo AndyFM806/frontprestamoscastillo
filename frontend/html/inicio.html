@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inicio - Registro de Préstamo</title>
+  <link rel="stylesheet" href="../css/inicio.css">
+</head>
+<body>
+  <div class="layout">
+    <!-- Menú lateral -->
+    <aside class="sidebar">
+      <h2 class="logo">Préstamos Castillo</h2>
+      <nav>
+        <ul>
+          <li class="active"><a href="inicio.html">🏠 Inicio</a></li>
+          <li><a href="historial.html">📄 Historial</a></li>
+          <li><a href="configuracion.html">⚙️ Configuraciones</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Contenido principal -->
+    <main class="main">
+      <h1>Registrar Préstamo</h1>
+
+      <div class="card">
+        <!-- Buscar cliente -->
+        <div class="form-section">
+          <label for="tipo-doc">Tipo de documento</label>
+          <select id="tipo-doc">
+            <option value="DNI">DNI</option>
+            <option value="RUC">RUC</option>
+          </select>
+
+          <label for="numero-doc">Número</label>
+          <div class="inline-group">
+            <input type="text" id="numero-doc" placeholder="Ingrese número" />
+            <button id="consultar-btn">Consultar</button>
+          </div>
+
+          <!-- Contenedor dinámico según el tipo de documento -->
+          <div id="datos-cliente">
+            <!-- Se autocompleta -->
+            <label id = "label-nombre" for="nombre">Nombre</label>
+            <input type="text" id="nombre" readonly />
+
+            <div id="dni-extra" style="display: none;">
+              <label for="apellido">Apellido</label>
+              <input type="text" id="apellido" readonly />
+            </div>
+
+            <label for="direccion">Dirección</label>
+            <input type="text" id="direccion" readonly />
+          </div>
+        </div>
+
+        <!-- Registro de préstamo -->
+        <div class="form-section">
+          <label for="monto">Monto del préstamo</label>
+          <input type="number" id="monto" placeholder="Ej: 4500.00" min="1" max="19000" />
+
+          <label for="cuotas">Cantidad de meses (cuotas)</label>
+          <input type="number" id="cuotas" placeholder="Ej: 12" min="1" max="36" />
+
+          <div class="btn-group">
+            <button id="registrar-btn">Registrar préstamo</button>
+            <button id="generar-cronograma-btn" class="secondary">Generar cronograma</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/inicio.js"></script>
+</body>
+</html>
