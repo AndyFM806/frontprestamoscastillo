@@ -4,7 +4,7 @@ document.getElementById("login-form").addEventListener("submit", async function 
     const clave = document.getElementById("clave").value;
   
     try {
-      const response = await fetch("https://backpracticaagile.onrender.com/api/usuarios/login", {
+      const response = await fetch("https://backpracticaagile.onrender.com/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ usuario, clave }),
