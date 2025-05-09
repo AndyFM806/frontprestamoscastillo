@@ -70,6 +70,10 @@
           <label for="fecha">Fecha del préstamo</label>
           <input type="date" id="fecha" />
 
+          <p><strong>Cuota mensual estimada (TEA 10%):</strong> <span id="cuota-tea">S/ 0.00</span></p>
+          <p><strong>Interés total:</strong> <span id="interes-tea">S/ 0.00</span></p>
+          
+
           <div class="btn-group">
             <button id="registrar-btn">Registrar préstamo</button>
             <button id="generar-cronograma-btn" class="secondary">Generar cronograma</button>
@@ -86,8 +90,42 @@
             fechaInput.setAttribute("min", hoy);
             fechaInput.value = hoy;
             });
-          </script>
-          
+  </script>
+
+  <script>
+  const montoInput = document.getElementById("monto");
+  const cuotasInput = document.getElementById("cuotas");
+  const cuotaSpan = document.getElementById("cuota-tea");
+  const interesSpan = document.getElementById("interes-tea");
+
+  function calcularCuotaTEA() {
+    const monto = parseFloat(montoInput.value);
+    const n = parseInt(cuotasInput.value);
+
+    if (isNaN(monto) || isNaN(n) || n < 1) {
+      cuotaSpan.textContent = "S/ 0.00";
+      interesSpan.textContent = "S/ 0.00";
+      return;
+    }
+
+    const tea = 0.10;
+    const tem = Math.pow(1 + tea, 1 / 12) - 1;
+
+    const unoMasI = 1 + tem;
+    const numerador = tem * Math.pow(unoMasI, n);
+    const denominador = Math.pow(unoMasI, n) - 1;
+
+    const cuota = monto * (numerador / denominador);
+    const interes = cuota * n - monto;
+
+    cuotaSpan.textContent = `S/ ${cuota.toFixed(2)}`;
+    interesSpan.textContent = `S/ ${interes.toFixed(2)}`;
+  }
+
+  montoInput.addEventListener("input", calcularCuotaTEA);
+  cuotasInput.addEventListener("input", calcularCuotaTEA);
+</script>
+
   <script src="../js/inicio.js"></script>
 
     <!-- Botón de cerrar sesión -->
