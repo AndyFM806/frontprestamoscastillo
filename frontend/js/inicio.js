@@ -69,11 +69,13 @@ document.getElementById("registrar-btn").addEventListener("click", async () => {
     return alert("Error validando el monto mensual.\n" + (e.message || e));
   }
 
+  const fecha = document.getElementById("fecha").value;
   // Enviar datos del préstamo
   const body = {
     dniRuc: clienteConsultado.dniRuc,
     monto,
-    plazoMeses: cuotas
+    plazoMeses: cuotas,
+    fechaEmision: fecha
   };
 
   try {

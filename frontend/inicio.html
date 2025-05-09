@@ -67,6 +67,9 @@
           <label for="cuotas">Cantidad de meses (cuotas)</label>
           <input type="number" id="cuotas" placeholder="Ej: 12" min="1" max="36" />
 
+          <label for="fecha">Fecha del préstamo</label>
+          <input type="date" id="fecha" />
+
           <div class="btn-group">
             <button id="registrar-btn">Registrar préstamo</button>
             <button id="generar-cronograma-btn" class="secondary">Generar cronograma</button>
@@ -76,6 +79,15 @@
     </main>
   </div>
 
+  <script>
+          window.addEventListener("DOMContentLoaded", () => {
+            const fechaInput = document.getElementById("fecha-emision");
+            const hoy = new Date().toISOString().split("T")[0];
+            fechaInput.setAttribute("min", hoy);
+            fechaInput.value = hoy;
+            });
+          </script>
+          
   <script src="../js/inicio.js"></script>
 
     <!-- Botón de cerrar sesión -->
