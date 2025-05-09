@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Configuracion</title>
   <script>
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (!token) {
       window.location.href = "login.html";
     }
@@ -20,9 +20,9 @@
       <h2 class="logo">Préstamos Castillo</h2>
       <nav>
         <ul>
-          <li><a href="inicio.html">🏠 Inicio</a></li>
-          <li><a href="historial.html">📄 Historial</a></li>
-          <li class="active"><a href="configuracion.html">⚙️ Configuraciones</a></li>
+          <li><a href="inicio.html">Inicio</a></li>
+          <li><a href="historial.html">Historial</a></li>
+          <li class="active"><a href="configuracion.html">Configuraciones</a></li>
         </ul>
       </nav>
     </aside>
@@ -39,7 +39,7 @@
               </section>
 
               <section class="config-section">
-                <h2>🔒 Cambiar contraseña</h2>
+                <h2>Cambiar contraseña</h2>
                 
                 <label for="nueva-contrasena">Nueva contraseña</label>
                 <input type="password" id="nueva-contrasena" name="nueva-contrasena" placeholder="Escribe la nueva contraseña">

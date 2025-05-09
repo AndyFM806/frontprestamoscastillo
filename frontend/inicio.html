@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inicio - Registro de Préstamo</title>
-  
+
     <script>
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (!token) {
       window.location.href = "login.html";
     }
@@ -21,9 +21,9 @@
       <h2 class="logo">Préstamos Castillo</h2>
       <nav>
         <ul>
-          <li class="active"><a href="inicio.html">🏠 Inicio</a></li>
-          <li><a href="historial.html">📄 Historial</a></li>
-          <li><a href="configuracion.html">⚙️ Configuraciones</a></li>
+          <li class="active"><a href="inicio.html">Inicio</a></li>
+          <li><a href="historial.html">Historial</a></li>
+          <li><a href="configuracion.html">Configuraciones</a></li>
         </ul>
       </nav>
     </aside>
