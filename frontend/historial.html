@@ -50,18 +50,15 @@
           </tbody>
         </table>
       </div>
-    </main>
-  </div>
 
-        <div class="paginacion">
+      <div class="paginacion">
         <button id="anterior">Anterior</button>
         <span id="pagina-actual">Página 1</span>
         <button id="siguiente">Siguiente</button>
       </div>
     </main>
   </div>
-
-  <!-- JS incluido directamente -->
+  <!-- SCRIPT DE PAGINACIÓN Y VER CRONOGRAMA -->
   <script>
     const API_URL = "https://backpracticaagile.onrender.com/api";
     let prestamos = [];
@@ -70,13 +67,14 @@
 
     async function cargarHistorial() {
       try {
-        const res = await fetch(`${API_URL}/prestamos`);
-        if (!res.ok) throw new Error("Error al cargar préstamos");
-
+        const res = await fetch(`${API_URL}/prestamos/historial`);
+        if (!res.ok) throw new Error("No se pudo cargar el historial.");
         prestamos = await res.json();
         mostrarPagina(paginaActual);
-      } catch (e) {
-        alert("Error: " + e.message);
+      } catch (err) {
+        console.error("Error al cargar historial:", err.message);
+        document.getElementById("tabla-historial").innerHTML =
+          `<tr><td colspan="6">Error al cargar historial.</td></tr>`;
       }
     }
 
@@ -88,21 +86,34 @@
       const tbody = document.getElementById("tabla-historial");
       tbody.innerHTML = "";
 
-      prestamosPagina.forEach(p => {
+      if (prestamosPagina.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6">No hay préstamos registrados.</td></tr>`;
+        return;
+      }
+
+      prestamosPagina.forEach(prestamo => {
         const fila = `
           <tr>
-            <td>${p.id}</td>
-            <td>${p.cliente.dniRuc}</td>
-            <td>${p.cliente.nombre}</td>
-            <td>${p.fecha}</td>
-            <td>S/ ${p.monto}</td>
-            <td><a href="${p.linkPdf}" target="_blank">Ver</a></td>
+            <td>${prestamo.id}</td>
+            <td>${prestamo.dniRuc || prestamo.cliente?.dniRuc}</td>
+            <td>${prestamo.nombre || prestamo.cliente?.nombre}</td>
+            <td>${prestamo.fecha}</td>
+            <td>S/ ${prestamo.monto}</td>
+            <td><button onclick="verCronograma(${prestamo.id})">📄 Ver</button></td>
           </tr>
         `;
         tbody.innerHTML += fila;
       });
 
       document.getElementById("pagina-actual").textContent = `Página ${paginaActual}`;
+
+      // Activar/desactivar botones de paginación
+      document.getElementById("anterior").disabled = paginaActual === 1;
+      document.getElementById("siguiente").disabled = paginaActual * limitePorPagina >= prestamos.length;
+    }
+
+    function verCronograma(prestamoId) {
+      window.open(`${API_URL}/cronograma/descargar/${prestamoId}`, "_blank");
     }
 
     document.getElementById("siguiente").addEventListener("click", () => {
@@ -121,7 +132,5 @@
 
     cargarHistorial();
   </script>
-  
-  <script src="../js/historial.js"></script>
 </body>
 </html>
