@@ -65,7 +65,7 @@ document.getElementById("registrar-btn").addEventListener("click", async () => {
       return alert("Este préstamo excede el límite mensual de S/ 76,000 por cliente.");
     }
   } catch (e) {
-    console.error("❌ Error al validar límite mensual:", e.message || e);
+    console.error("Error al validar límite mensual:", e.message || e);
     return alert("Error validando el monto mensual.\n" + (e.message || e));
   }
 

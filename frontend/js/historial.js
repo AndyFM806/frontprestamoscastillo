@@ -31,7 +31,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     });
     
   } catch (err) {
-    console.error("❌ Error al cargar historial:", err.message || err);
+    console.error("Error al cargar historial:", err.message || err);
     tabla.innerHTML = `<tr><td colspan="6">Error al cargar historial.</td></tr>`;
   }
 });
