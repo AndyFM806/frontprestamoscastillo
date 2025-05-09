@@ -10,7 +10,7 @@ async function cambiarUsuario() {
   }
 
   try {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     const response = await fetch(`${API_URL}/cambiar-usuario`, {
       method: "POST",
@@ -51,7 +51,7 @@ async function cambiarContrasena() {
   }
 
   try {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     const response = await fetch(`${API_URL}/cambiar-password`, {
       method: "POST",
