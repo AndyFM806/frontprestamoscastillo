@@ -14,6 +14,7 @@
 
   <link rel="stylesheet" href="../css/inicio.css">
 </head>
+
 <body>
   <div class="layout">
     <!-- Menú lateral -->
@@ -76,5 +77,29 @@
   </div>
 
   <script src="../js/inicio.js"></script>
+
+    <!-- Botón de cerrar sesión -->
+  <button id="cerrar-sesion-btn" style="
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 8px 16px;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 1000;
+  ">Cerrar sesión</button>
+
+  <script src="../js/inicio.js"></script>
+  <script>
+    document.getElementById("cerrar-sesion-btn").addEventListener("click", () => {
+      sessionStorage.removeItem("token");
+      window.location.href = "login.html";
+    });
+  </script>
+</body>
+
 </body>
 </html>
