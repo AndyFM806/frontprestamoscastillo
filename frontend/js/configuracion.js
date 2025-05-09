@@ -13,7 +13,7 @@ async function cambiarUsuario() {
     const token = localStorage.getItem("token");
 
     const response = await fetch(`${API_URL}/cambiar-usuario`, {
-      method: "PUT",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
@@ -54,7 +54,7 @@ async function cambiarContrasena() {
     const token = localStorage.getItem("token");
 
     const response = await fetch(`${API_URL}/cambiar-password`, {
-      method: "PUT",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
