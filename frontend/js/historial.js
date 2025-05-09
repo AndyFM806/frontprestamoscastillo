@@ -15,20 +15,21 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     prestamos.forEach(prestamo => {
       const fila = document.createElement("tr");
-
+    
       fila.innerHTML = `
         <td>${prestamo.id}</td>
-        <td>${prestamo.cliente.dniRuc}</td>
-        <td>${prestamo.cliente.nombre}</td>
+        <td>${prestamo.dniRuc}</td>
+        <td>${prestamo.nombre}</td>
         <td>${prestamo.fecha}</td>
         <td>S/ ${prestamo.monto}</td>
         <td>
           <button onclick="verCronograma(${prestamo.id})">📄 Ver</button>
         </td>
       `;
-
+    
       tabla.appendChild(fila);
     });
+    
   } catch (err) {
     console.error("❌ Error al cargar historial:", err.message || err);
     tabla.innerHTML = `<tr><td colspan="6">Error al cargar historial.</td></tr>`;
