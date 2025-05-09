@@ -2,48 +2,38 @@ const API_URL = "https://backpracticaagile.onrender.com/api";
 let clienteConsultado = null;
 
 document.getElementById("tipo-doc").addEventListener("change", function () {
-  const tipo = this.value;
-  const dniExtra = document.getElementById("dni-extra");
-  const rucExtra = document.getElementById("ruc-extra");
+    const tipo = this.value;
+    document.getElementById("dni-extra").style.display = tipo === "DNI" ? "block" : "none";
+    document.getElementById("ruc-extra").style.display = tipo === "RUC" ? "block" : "none";
 
-if (dniExtra) dniExtra.style.display = tipo === "DNI" ? "block" : "none";
-if (rucExtra) rucExtra.style.display = tipo === "RUC" ? "block" : "none";
-
-  // Limpiar campos al cambiar tipo
-  document.getElementById("nombre").value = "";
-  document.getElementById("apellido").value = "";
-  document.getElementById("direccion").value = "";
+    // Limpiar campos al cambiar tipo
+    document.getElementById("numero-doc").value = "";
+    document.getElementById("nombre").value = "";
+    document.getElementById("direccion").value = "";
 });
 
 document.getElementById("consultar-btn").addEventListener("click", async () => {
-  const tipoDoc = document.getElementById("tipo-doc").value;
-  const numero = document.getElementById("numero-doc").value.trim();
+    const tipoDoc = document.getElementById("tipo-doc").value;
+    const numero = document.getElementById("numero-doc").value.trim();
 
-  if (!numero) return alert("Ingrese un número de documento.");
+    if (!numero) return alert("Ingrese un número de documento.");
 
-  const endpoint = `/clientes/buscar/${numero}`;
+    const endpoint = `/clientes/buscar/${numero}`;
 
-  try {
-    const res = await fetch(API_URL + endpoint);
-    if (!res.ok) throw new Error("No encontrado");
+    try {
+        const res = await fetch(API_URL + endpoint);
+        if (!res.ok) throw new Error("No encontrado");
 
-    const data = await res.json();
-    clienteConsultado = data;
+        const data = await res.json();
+        clienteConsultado = data;
 
-    if (tipoDoc === "DNI") {
-      document.getElementById("nombre").value = data.nombre || "";
-      document.getElementById("apellido").value = data.apellido || "";
-      document.getElementById("direccion").value = "";
-    } else {
-      document.getElementById("nombre").value = data.nombre || "";
-      document.getElementById("apellido").value = "";
-      document.getElementById("direccion").value = data.direccion || "";
+        document.getElementById("nombre").value = data.nombre || "";
+        document.getElementById("direccion").value = data.direccion || "";
+
+    } catch (err) {
+        alert("Cliente no encontrado.\n" + err.message);
+        clienteConsultado = null;
     }
-  } catch (err) {
-    alert("Cliente no encontrado.\n" + err.message);
-    clienteConsultado = null;
-  }
-  
 });
 
 // Registrar préstamo
