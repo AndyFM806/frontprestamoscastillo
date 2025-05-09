@@ -2,33 +2,40 @@ const API_URL = "https://backpracticaagile.onrender.com/api";
 let clienteConsultado = null;
 
 document.getElementById("tipo-doc").addEventListener("change", function () {
-  const tipo = this.value;
-  document.getElementById("dni-extra").style.display = tipo === "DNI" ? "block" : "none";
-  document.getElementById("ruc-extra").style.display = tipo === "RUC" ? "block" : "none";
+    const tipo = this.value;
+    document.getElementById("dni-extra").style.display = tipo === "DNI" ? "block" : "none";
+    document.getElementById("ruc-extra").style.display = tipo === "RUC" ? "block" : "none";
+
+    // Limpiar campos al cambiar tipo
+    document.getElementById("numero-doc").value = "";
+    document.getElementById("nombre").value = "";
+    document.getElementById("direccion").value = "";
 });
 
 document.getElementById("consultar-btn").addEventListener("click", async () => {
-  const tipoDoc = document.getElementById("tipo-doc").value;
-  const numero = document.getElementById("numero-doc").value.trim();
+    const tipoDoc = document.getElementById("tipo-doc").value;
+    const numero = document.getElementById("numero-doc").value.trim();
 
-  if (!numero) return alert("Ingrese un número de documento.");
-  const endpoint = `/clientes/buscar/${numero}`;
+    if (!numero) return alert("Ingrese un número de documento.");
 
-  try {
-    const res = await fetch(API_URL + endpoint);
-    if (!res.ok) throw new Error("No encontrado");
+    const endpoint = `/clientes/buscar/${numero}`;
 
-    const data = await res.json();
-    clienteConsultado = data;
+    try {
+        const res = await fetch(API_URL + endpoint);
+        if (!res.ok) throw new Error("No encontrado");
 
-    document.getElementById("nombre").value = data.nombre;
-    document.getElementById("apellido").value = tipoDoc === "DNI" ? data.apellido : "";
-    document.getElementById("direccion").value = tipoDoc === "RUC" ? data.direccion : "";
-  } catch (err) {
-    alert("Cliente no encontrado.");
-    clienteConsultado = null;
-  }
+        const data = await res.json();
+        clienteConsultado = data;
+
+        document.getElementById("nombre").value = data.nombre || "";
+        document.getElementById("direccion").value = data.direccion || "";
+
+    } catch (err) {
+        alert("Cliente no encontrado.\n" + err.message);
+        clienteConsultado = null;
+    }
 });
+
 // Registrar préstamo
 document.getElementById("registrar-btn").addEventListener("click", async () => {
   if (!clienteConsultado) return alert("Debe consultar un cliente primero.");
