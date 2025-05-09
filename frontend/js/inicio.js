@@ -44,12 +44,11 @@ document.getElementById("registrar-btn").addEventListener("click", async () => {
     return alert("El número de cuotas debe estar entre 1 y 36.");
   }
 
-  // Validar límite mensual
   try {
     const respuesta = await fetch(`${API_URL}/prestamos/totales/${clienteConsultado.dniRuc}`);
-    const json = await respuesta.json();
-    const totalMensual = parseFloat(json.totalMensual || 0);
-
+    if (!respuesta.ok) throw new Error("No se pudo obtener el total mensual.");
+    const totalMensual = parseFloat(await respuesta.text());
+  
     if ((totalMensual + monto) > 76000) {
       return alert("Este préstamo excede el límite mensual de S/ 76,000 por cliente.");
     }
@@ -57,29 +56,29 @@ document.getElementById("registrar-btn").addEventListener("click", async () => {
     console.error("Error al validar límite mensual:", e);
     return alert("Error validando el monto mensual.");
   }
+  
+    const body = {
+      dniRuc: clienteConsultado.dniRuc,
+      monto,
+      plazoMeses: cuotas
+    };
 
-  const body = {
-    dniRuc: clienteConsultado.dniRuc,
-    monto,
-    plazoMeses: cuotas
-  };
+    try {
+      const res = await fetch(`${API_URL}/prestamos`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
 
-  try {
-    const res = await fetch(`${API_URL}/prestamos`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
-
-    if (res.ok) {
-      alert("Préstamo registrado con éxito.");
-      location.reload();
-    } else {
-      const err = await res.text();
-      alert("Error al registrar préstamo: " + err);
+      if (res.ok) {
+        alert("Préstamo registrado con éxito.");
+        location.reload();
+      } else {
+        const err = await res.text();
+        alert("Error al registrar préstamo: " + err);
+      }
+    } catch (error) {
+      alert("Ocurrió un error al registrar.");
+      console.error(error);
     }
-  } catch (error) {
-    alert("Ocurrió un error al registrar.");
-    console.error(error);
-  }
 });
