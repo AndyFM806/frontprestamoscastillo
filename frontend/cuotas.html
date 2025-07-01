@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Cuotas Pendientes</title>
+  <link rel="stylesheet" href="../css/cuotas.css">
+</head>
+<body>
+  <h1>Cuotas Pendientes</h1>
+  <button onclick="cargarCuotas()">Cargar Cuotas</button>
+
+  <table id="tabla-cuotas" style="display: none;">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Monto</th>
+        <th>Fecha de Pago</th>
+        <th>Comprobante</th>
+        <th>Medio de Pago</th>
+      </tr>
+    </thead>
+    <tbody id="tbody-cuotas"></tbody>
+  </table>
+
+  <div id="mensaje-vacio" class="empty"></div>
+
+  <script src="../js/cuotas.js"></script>
+</body>
+</html>
