@@ -1,31 +1,50 @@
-async function cargarCuotas() {
-  const response = await fetch('https://backpracticaagile.onrender.com/api/cuotas/pendientes');
-  const cuotas = await response.json();
+document.getElementById("cargarCuotas").addEventListener("click", async () => {
+  try {
+    const response = await fetch("https://backpracticaagile.onrender.com/api/cuotas/pendientes");
+    const text = await response.text();
 
-  const tbody = document.getElementById('tbody-cuotas');
-  const tabla = document.getElementById('tabla-cuotas');
-  const mensaje = document.getElementById('mensaje-vacio');
+    // Imprimimos la respuesta cruda
+    console.log("Texto recibido del backend:", text);
 
-  tbody.innerHTML = '';
-  mensaje.textContent = '';
+    // Intentamos convertir a JSON
+    const cuotas = JSON.parse(text);
 
-  if (cuotas.length === 0) {
-    tabla.style.display = 'none';
-    mensaje.textContent = 'No hay cuotas pendientes.';
-    return;
-  }
+    // Limpiamos el contenedor
+    const contenedor = document.getElementById("contenedorCuotas");
+    contenedor.innerHTML = "";
 
-  tabla.style.display = 'table';
+    if (cuotas.length === 0) {
+      contenedor.innerHTML = "<p>No hay cuotas pendientes.</p>";
+      return;
+    }
 
-  cuotas.forEach((cuota, index) => {
-    const fila = document.createElement('tr');
-    fila.innerHTML = `
-      <td>${index + 1}</td>
-      <td>S/. ${parseFloat(cuota.monto).toFixed(2)}</td>
-      <td>${cuota.fechaPago || cuota.fecha_pago}</td>
-      <td>${cuota.comprobante || '-'}</td>
-      <td>${cuota.medioPago || cuota.medio_pago || '-'}</td>
+    // Creamos tabla
+    const tabla = document.createElement("table");
+    tabla.innerHTML = `
+      <tr>
+        <th>ID</th>
+        <th>Préstamo ID</th>
+        <th>Fecha de Pago</th>
+        <th>Monto</th>
+        <th>Pagado</th>
+      </tr>
     `;
-    tbody.appendChild(fila);
-  });
-}
+
+    cuotas.forEach(cuota => {
+      const fila = document.createElement("tr");
+      fila.innerHTML = `
+        <td>${cuota.id}</td>
+        <td>${cuota.prestamo_id}</td>
+        <td>${cuota.fecha_pago}</td>
+        <td>${cuota.monto}</td>
+        <td>${cuota.pagado}</td>
+      `;
+      tabla.appendChild(fila);
+    });
+
+    contenedor.appendChild(tabla);
+
+  } catch (error) {
+    console.error("Error al procesar la respuesta:", error);
+  }
+});
