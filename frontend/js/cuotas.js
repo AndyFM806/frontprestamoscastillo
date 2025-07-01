@@ -1,5 +1,5 @@
 async function cargarCuotas() {
-  const response = await fetch('http://localhost:8080/api/cuotas/pendientes');
+  const response = await fetch('https://backpracticaagile.onrender.com/api/cuotas/pendientes');
   const cuotas = await response.json();
 
   const tbody = document.getElementById('tbody-cuotas');
