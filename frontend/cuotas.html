@@ -1,44 +1,43 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sistema de Cuotas</title>
-  <link rel="stylesheet" href="../css/cuotas.css" />
+  <meta charset="UTF-8">
+  <title>Gestión de Cuotas - Préstamos Castillo</title>
+  <link rel="stylesheet" href="../frontend/css/cuotas.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Gestión de Cuotas</h1>
+  <h1>Panel de Gestión de Cuotas</h1>
 
-    <label for="clienteId">ID del Cliente:</label>
-    <input type="number" id="clienteId" placeholder="Ingrese ID de cliente" />
+  <div class="busqueda">
+    <input type="number" id="clienteId" placeholder="ID del Cliente">
     <button onclick="obtenerCuotas()">Buscar Deudas</button>
-
-    <table id="tablaCuotas">
-      <thead>
-        <tr>
-          <th>N°</th>
-          <th>Fecha de Pago</th>
-          <th>Monto</th>
-          <th>Estado</th>
-          <th>Acción</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
   </div>
 
+  <table id="tablaCuotas">
+    <thead>
+      <tr>
+        <th>N° Cuota</th>
+        <th>Fecha de Pago</th>
+        <th>Monto</th>
+        <th>Estado</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Las cuotas se llenan dinámicamente -->
+    </tbody>
+  </table>
+
+  <!-- Modal para comprobante -->
   <div id="modal" class="modal hidden">
-    <div class="modal-content">
-      <h2>Comprobante de Pago</h2>
+    <div class="modal-contenido">
+      <h2>Resumen del Comprobante</h2>
       <pre id="comprobanteResumen"></pre>
-      <div class="modal-buttons">
-        <button id="descargarBtn">Descargar Comprobante</button>
-        <button onclick="cerrarModal()">Cerrar</button>
-      </div>
+      <button id="descargarBtn">Descargar PDF</button>
+      <button onclick="cerrarModal()">Cerrar</button>
     </div>
   </div>
 
-  <script src="../js/cuotas.js"></script>
+  <script src="../frontend/js/cuotas.js"></script>
 </body>
 </html>
