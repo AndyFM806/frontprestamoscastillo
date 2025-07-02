@@ -22,40 +22,64 @@ function obtenerCuotas() {
 function mostrarCuotas(cuotas) {
   tablaBody.innerHTML = "";
   const hoy = new Date();
+  let mostroAlertaHoy = false;
 
-  cuotas.forEach(cuota => {
-    const tr = document.createElement("tr");
+  // Agrega prioridad y clase visual a cada cuota
+  const cuotasConPrioridad = cuotas.map(cuota => {
     const fechaPago = new Date(cuota.fechaPago);
     const pagado = cuota.pagado;
+    let prioridad = 5;
+    let clase = "pendiente";
 
-    // Estado visual
-    if (pagado && esDelMes(fechaPago, hoy)) {
-      tr.classList.add("pagado");
-    } else if (!pagado && fechaPago < hoy) {
-      tr.classList.add("atrasado");
-    } else if (!pagado && mismaFecha(fechaPago, hoy)) {
-      tr.classList.add("hoy");
-    } else if (!pagado && diasDiferencia(hoy, fechaPago) <= 7) {
-      tr.classList.add("porVencer");
-    } else {
-      tr.classList.add("pendiente");
+    if (pagado) {
+      prioridad = 5;
+      clase = "pagado";
+    } else if (fechaPago < hoy && esDelMes(fechaPago, hoy)) {
+      prioridad = 1;
+      clase = "atrasado";
+    } else if (mismaFecha(fechaPago, hoy)) {
+      prioridad = 2;
+      clase = "hoy";
+      if (!mostroAlertaHoy) {
+        alert("¡Atención! Hay cuotas que vencen hoy y aún no han sido pagadas.");
+        mostroAlertaHoy = true;
+      }
+    } else if (diasDiferencia(hoy, fechaPago) <= 7 && fechaPago > hoy) {
+      prioridad = 3;
+      clase = "porVencer";
     }
+
+    return { ...cuota, prioridad, clase };
+  });
+
+  // Ordena por prioridad
+  cuotasConPrioridad.sort((a, b) => a.prioridad - b.prioridad);
+
+  // Renderiza las filas en orden
+  cuotasConPrioridad.forEach(cuota => {
+    const tr = document.createElement("tr");
+    tr.classList.add(cuota.clase);
 
     tr.innerHTML = `
       <td>${cuota.numero}</td>
-      <td>${cuota.fechaPago}</td>
-      <td>S/ ${cuota.monto.toFixed(2)}</td>
-      <td>${pagado ? "Pagado" : "Pendiente"}</td>
+      <td><strong>${cuota.fechaPago}</strong></td>
+      <td><strong>S/ ${cuota.monto.toFixed(2)}</strong></td>
+      <td>${cuota.pagado ? "Pagado" : "Pendiente"}</td>
       <td>
-        ${pagado 
-          ? `<button disabled class="btn btn-disabled">Pagado</button>` 
-          : `<button class="btn btn-pagar" onclick="pagarCuota(${cuota.id})">Pagar</button>`}
+        ${cuota.pagado
+          ? `<button disabled class="btn btn-disabled">Pagado</button>`
+          : `<button class="btn btn-pagar">Pagar</button>`}
       </td>
     `;
+
+    if (!cuota.pagado) {
+      tr.querySelector(".btn-pagar").addEventListener("click", () => pagarCuota(cuota.id));
+    }
 
     tablaBody.appendChild(tr);
   });
 }
+
 
 function diasDiferencia(fecha1, fecha2) {
   const diff = fecha2 - fecha1;
