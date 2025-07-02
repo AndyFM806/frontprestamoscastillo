@@ -26,34 +26,34 @@ function mostrarCuotas(cuotas) {
 
   // Agrega prioridad y clase visual a cada cuota
   const cuotasConPrioridad = cuotas.map(cuota => {
-    const fechaPago = new Date(cuota.fechaPago);
-    const pagado = cuota.pagado;
-    let prioridad = 5;
-    let clase = "pendiente";
+  const fechaPago = new Date(cuota.fechaPago);
+  const pagado = cuota.pagado;
+  let prioridad = 99;
+  let clase = "pendiente";
 
-    if (!pagado && mismaFecha(fechaPago, hoy)) {
-      prioridad = 1;
-      clase = "hoy";
-      if (!mostroAlertaHoy) {
-        alert("¡Atención! Hay cuotas que vencen hoy y aún no han sido pagadas.");
-        mostroAlertaHoy = true;
-      }
-    } else if (!pagado && fechaPago < hoy) {
-      prioridad = 2;
-      clase = "atrasado";
-    } else if (!pagado && diasDiferencia(hoy, fechaPago) <= 7 && fechaPago > hoy) {
-      prioridad = 3;
-      clase = "porVencer";
-    } else if (pagado && esDelMes(fechaPago, hoy)) {
-      prioridad = 4;
-      clase = "pagado";
-    } else {
-      prioridad = 5;
-      clase = "pendiente";
+  if (pagado) {
+    prioridad = 5;
+    clase = "pagado";
+  } else if (mismaFecha(fechaPago, hoy)) {
+    prioridad = 0;
+    clase = "hoy";
+    if (!mostroAlertaHoy) {
+      alert("¡Atención! Hay cuotas que vencen hoy y aún no han sido pagadas.");
+      mostroAlertaHoy = true;
     }
+  } else if (diasDiferencia(hoy, fechaPago) <= 7 && fechaPago > hoy) {
+    prioridad = 1;
+    clase = "porVencer";
+  } else if (esDelMes(fechaPago, hoy)) {
+    prioridad = 2;
+    clase = "atrasado";
+  } else {
+    prioridad = 3;
+    clase = "pendiente";
+  }
 
-    return { ...cuota, prioridad, clase };
-  });
+  return { ...cuota, prioridad, clase };
+});
 
   // Ordena por prioridad
   cuotasConPrioridad.sort((a, b) => a.prioridad - b.prioridad);
