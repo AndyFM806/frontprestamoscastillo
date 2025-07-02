@@ -116,9 +116,20 @@ pre {
 }
 
 
-/* Alerta animada (para vencen hoy) */
+/* Estilo para cuotas que vencen hoy */
+.hoy {
+  font-weight: bold;
+  animation: parpadeo 1s infinite alternate;
+}
+
+/* Animación de parpadeo */
 @keyframes parpadeo {
-  0% { opacity: 1; }
-  50% { opacity: 0.3; }
-  100% { opacity: 1; }
+  from {
+    background-color: #fff3cd; /* Amarillo suave */
+    color: black;
+  }
+  to {
+    background-color: #f8d7da; /* Rojo claro */
+    color: darkred;
+  }
 }
