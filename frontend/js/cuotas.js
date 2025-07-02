@@ -100,7 +100,8 @@ Monto Pagado: S/ ${parseFloat(data.montoPagado).toFixed(2)}
 Medio de Pago: ${data.medioPago}
 Comprobante N°: ${data.numeroComprobante}
       `.trim();
-      modal.classList.remove("hidden");
+      modal.classList.add("show");
+
     })
     .catch(err => {
       console.error("Error:", err);
@@ -117,7 +118,8 @@ descargarBtn.addEventListener("click", () => {
 });
 
 function cerrarModal() {
-  modal.classList.add("hidden");
+  modal.classList.remove("show");
+
   resumen.innerText = "";
   idCuotaActual = null;
 }
