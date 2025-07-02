@@ -2,14 +2,14 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Gestión de Cuotas - Préstamos Castillo</title>
-  <link rel="stylesheet" href="../frontend/css/cuotas.css">
+  <title>Gestión de Cuotas | Préstamos Castillo</title>
+  <link rel="stylesheet" href="../css/cuotas.css">
 </head>
 <body>
-  <h1>Panel de Gestión de Cuotas</h1>
+  <h1>Gestión de Cuotas</h1>
 
-  <div class="busqueda">
-    <input type="number" id="clienteId" placeholder="ID del Cliente">
+  <div class="buscador">
+    <input type="number" id="clienteId" placeholder="Ingrese ID del Cliente" />
     <button onclick="obtenerCuotas()">Buscar Deudas</button>
   </div>
 
@@ -24,11 +24,11 @@
       </tr>
     </thead>
     <tbody>
-      <!-- Las cuotas se llenan dinámicamente -->
+      <!-- Las cuotas se mostrarán aquí -->
     </tbody>
   </table>
 
-  <!-- Modal para comprobante -->
+  <!-- Modal de comprobante -->
   <div id="modal" class="modal hidden">
     <div class="modal-contenido">
       <h2>Resumen del Comprobante</h2>
@@ -38,6 +38,6 @@
     </div>
   </div>
 
-  <script src="../frontend/js/cuotas.js"></script>
+  <script src="../js/cuotas.js"></script>
 </body>
 </html>
