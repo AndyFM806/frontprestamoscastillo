@@ -1,50 +1,75 @@
-document.getElementById("cargarCuotas").addEventListener("click", async () => {
-  try {
-    const response = await fetch("https://backpracticaagile.onrender.com/api/cuotas/pendientes");
-    const text = await response.text();
+const tablaBody = document.querySelector("#tablaCuotas tbody");
+const modal = document.getElementById("modal");
+const resumen = document.getElementById("comprobanteResumen");
+const descargarBtn = document.getElementById("descargarBtn");
 
-    // Imprimimos la respuesta cruda
-    console.log("Texto recibido del backend:", text);
+let idCuotaActual = null;
 
-    // Intentamos convertir a JSON
-    const cuotas = JSON.parse(text);
+function obtenerCuotas() {
+  const clienteId = document.getElementById("clienteId").value;
+  fetch(`https://backpracticaagile.onrender.com/api/cuotas/cliente/${clienteId}`)
+    .then(res => res.json())
+    .then(data => mostrarCuotas(data));
+}
 
-    // Limpiamos el contenedor
-    const contenedor = document.getElementById("contenedorCuotas");
-    contenedor.innerHTML = "";
+function mostrarCuotas(cuotas) {
+  tablaBody.innerHTML = "";
+  const hoy = new Date();
 
-    if (cuotas.length === 0) {
-      contenedor.innerHTML = "<p>No hay cuotas pendientes.</p>";
-      return;
-    }
+  cuotas.forEach(cuota => {
+    const tr = document.createElement("tr");
+    const fechaPago = new Date(cuota.fechaPago);
 
-    // Creamos tabla
-    const tabla = document.createElement("table");
-    tabla.innerHTML = `
-      <tr>
-        <th>ID</th>
-        <th>Préstamo ID</th>
-        <th>Fecha de Pago</th>
-        <th>Monto</th>
-        <th>Pagado</th>
-      </tr>
+    if (cuota.pagado) tr.classList.add("pagado");
+    else if (fechaPago < hoy) tr.classList.add("atrasado");
+    else if (fechaPago.toDateString() === hoy.toDateString()) tr.classList.add("hoy");
+    else if (diasDiferencia(hoy, fechaPago) <= 7) tr.classList.add("porVencer");
+    else tr.classList.add("pendiente");
+
+    tr.innerHTML = `
+      <td>${cuota.numero}</td>
+      <td>${cuota.fechaPago}</td>
+      <td>S/ ${cuota.monto}</td>
+      <td>${cuota.pagado ? "Pagado" : "Pendiente"}</td>
+      <td>
+        ${cuota.pagado ? `<button disabled>Pagado</button>` : 
+        `<button onclick="pagarCuota(${cuota.id})">Pagar</button>`}
+      </td>
     `;
 
-    cuotas.forEach(cuota => {
-      const fila = document.createElement("tr");
-      fila.innerHTML = `
-        <td>${cuota.id}</td>
-        <td>${cuota.prestamo_id}</td>
-        <td>${cuota.fecha_pago}</td>
-        <td>${cuota.monto}</td>
-        <td>${cuota.pagado}</td>
-      `;
-      tabla.appendChild(fila);
+    tablaBody.appendChild(tr);
+  });
+}
+
+function diasDiferencia(fecha1, fecha2) {
+  const diff = fecha2 - fecha1;
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
+
+function pagarCuota(id) {
+  const medioPago = prompt("Seleccione medio de pago: EFECTIVO, TRANSFERENCIA o TARJETA");
+  if (!medioPago) return;
+
+  fetch(`https://backpracticaagile.onrender.com/api/cuotas/${id}/pagar?medioPago=${medioPago}`, {
+    method: 'POST'
+  })
+    .then(res => res.json())
+    .then(data => {
+      idCuotaActual = id;
+      resumen.innerText = JSON.stringify(data, null, 2);
+      modal.classList.remove("hidden");
     });
+}
 
-    contenedor.appendChild(tabla);
-
-  } catch (error) {
-    console.error("Error al procesar la respuesta:", error);
+descargarBtn.addEventListener("click", () => {
+  if (idCuotaActual) {
+    window.open(`https://backpracticaagile.onrender.com/api/comprobantes/${idCuotaActual}/descargar`, "_blank");
+    cerrarModal();
+    obtenerCuotas();
   }
 });
+
+function cerrarModal() {
+  modal.classList.add("hidden");
+  idCuotaActual = null;
+}
