@@ -1,17 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Gestión de Cuotas | Préstamos Castillo</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gestión de Cuotas</title>
   <link rel="stylesheet" href="../css/cuotas.css">
 </head>
 <body>
   <h1>Gestión de Cuotas</h1>
-
-  <div class="buscador">
-    <input type="number" id="clienteId" placeholder="Ingrese ID del Cliente" />
-    <button onclick="obtenerCuotas()">Buscar Deudas</button>
-  </div>
 
   <table id="tablaCuotas">
     <thead>
@@ -23,17 +19,15 @@
         <th>Acción</th>
       </tr>
     </thead>
-    <tbody>
-      <!-- Las cuotas se mostrarán aquí -->
-    </tbody>
+    <tbody></tbody>
   </table>
 
-  <!-- Modal de comprobante -->
-  <div id="modal" class="modal hidden">
-    <div class="modal-contenido">
-      <h2>Resumen del Comprobante</h2>
+  <!-- Modal -->
+  <div id="modal" class="hidden">
+    <div class="modal-content">
+      <h3>Resumen del Comprobante</h3>
       <pre id="comprobanteResumen"></pre>
-      <button id="descargarBtn">Descargar PDF</button>
+      <button id="descargarBtn">Descargar Comprobante</button>
       <button onclick="cerrarModal()">Cerrar</button>
     </div>
   </div>

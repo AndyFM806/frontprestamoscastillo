@@ -5,11 +5,18 @@ const descargarBtn = document.getElementById("descargarBtn");
 
 let idCuotaActual = null;
 
+document.addEventListener("DOMContentLoaded", () => {
+  obtenerCuotas(); // ✅ Carga automática al abrir la página
+});
+
 function obtenerCuotas() {
-  const clienteId = document.getElementById("clienteId").value;
-  fetch(`https://backpracticaagile.onrender.com/api/cuotas/cliente/${clienteId}`)
+  fetch("https://backpracticaagile.onrender.com/api/cuotas/pendientes")
     .then(res => res.json())
-    .then(data => mostrarCuotas(data));
+    .then(cuotas => mostrarCuotas(cuotas))
+    .catch(err => {
+      console.error("Error al obtener cuotas:", err);
+      alert("No se pudieron cargar las cuotas.");
+    });
 }
 
 function mostrarCuotas(cuotas) {
@@ -19,21 +26,30 @@ function mostrarCuotas(cuotas) {
   cuotas.forEach(cuota => {
     const tr = document.createElement("tr");
     const fechaPago = new Date(cuota.fechaPago);
+    const pagado = cuota.pagado;
 
-    if (cuota.pagado) tr.classList.add("pagado");
-    else if (fechaPago < hoy) tr.classList.add("atrasado");
-    else if (fechaPago.toDateString() === hoy.toDateString()) tr.classList.add("hoy");
-    else if (diasDiferencia(hoy, fechaPago) <= 7) tr.classList.add("porVencer");
-    else tr.classList.add("pendiente");
+    // Estado visual
+    if (pagado && esDelMes(fechaPago, hoy)) {
+      tr.classList.add("pagado");
+    } else if (!pagado && fechaPago < hoy) {
+      tr.classList.add("atrasado");
+    } else if (!pagado && mismaFecha(fechaPago, hoy)) {
+      tr.classList.add("hoy");
+    } else if (!pagado && diasDiferencia(hoy, fechaPago) <= 7) {
+      tr.classList.add("porVencer");
+    } else {
+      tr.classList.add("pendiente");
+    }
 
     tr.innerHTML = `
       <td>${cuota.numero}</td>
       <td>${cuota.fechaPago}</td>
-      <td>S/ ${cuota.monto}</td>
-      <td>${cuota.pagado ? "Pagado" : "Pendiente"}</td>
+      <td>S/ ${cuota.monto.toFixed(2)}</td>
+      <td>${pagado ? "Pagado" : "Pendiente"}</td>
       <td>
-        ${cuota.pagado ? `<button disabled>Pagado</button>` : 
-        `<button onclick="pagarCuota(${cuota.id})">Pagar</button>`}
+        ${pagado 
+          ? `<button disabled class="btn btn-disabled">Pagado</button>` 
+          : `<button class="btn btn-pagar" onclick="pagarCuota(${cuota.id})">Pagar</button>`}
       </td>
     `;
 
@@ -46,18 +62,49 @@ function diasDiferencia(fecha1, fecha2) {
   return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }
 
+function mismaFecha(f1, f2) {
+  return f1.toISOString().slice(0, 10) === f2.toISOString().slice(0, 10);
+}
+
+function esDelMes(fecha, ref) {
+  return fecha.getMonth() === ref.getMonth() && fecha.getFullYear() === ref.getFullYear();
+}
+
 function pagarCuota(id) {
-  const medioPago = prompt("Seleccione medio de pago: EFECTIVO, TRANSFERENCIA o TARJETA");
-  if (!medioPago) return;
+  const medioPago = prompt("Seleccione medio de pago: EFECTIVO, TRANSFERENCIA o TARJETA").toUpperCase();
+  if (!["EFECTIVO", "TRANSFERENCIA", "TARJETA"].includes(medioPago)) {
+    alert("Medio de pago inválido.");
+    return;
+  }
 
   fetch(`https://backpracticaagile.onrender.com/api/cuotas/${id}/pagar?medioPago=${medioPago}`, {
-    method: 'POST'
+    method: 'PUT'
   })
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) throw new Error("Error al pagar");
+      return res.json();
+    })
     .then(data => {
       idCuotaActual = id;
-      resumen.innerText = JSON.stringify(data, null, 2);
+      resumen.innerText = `
+Empresa: ${data.nombreEmpresa}
+RUC: ${data.rucEmpresa}
+Dirección: ${data.direccionEmpresa}
+Teléfono: ${data.telefonoEmpresa}
+Email: ${data.emailEmpresa}
+
+Cliente: ${data.nombreCliente}
+DNI/RUC: ${data.dniCliente}
+Fecha de Pago: ${data.fechaPago}
+Monto Pagado: S/ ${parseFloat(data.montoPagado).toFixed(2)}
+Medio de Pago: ${data.medioPago}
+Comprobante N°: ${data.numeroComprobante}
+      `.trim();
       modal.classList.remove("hidden");
+    })
+    .catch(err => {
+      console.error("Error:", err);
+      alert("No se pudo procesar el pago.");
     });
 }
 
@@ -71,5 +118,6 @@ descargarBtn.addEventListener("click", () => {
 
 function cerrarModal() {
   modal.classList.add("hidden");
+  resumen.innerText = "";
   idCuotaActual = null;
 }
