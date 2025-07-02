@@ -31,22 +31,25 @@ function mostrarCuotas(cuotas) {
     let prioridad = 5;
     let clase = "pendiente";
 
-    if (pagado) {
-      prioridad = 5;
-      clase = "pagado";
-    } else if (fechaPago < hoy && esDelMes(fechaPago, hoy)) {
+    if (!pagado && mismaFecha(fechaPago, hoy)) {
       prioridad = 1;
-      clase = "atrasado";
-    } else if (mismaFecha(fechaPago, hoy)) {
-      prioridad = 2;
       clase = "hoy";
       if (!mostroAlertaHoy) {
         alert("¡Atención! Hay cuotas que vencen hoy y aún no han sido pagadas.");
         mostroAlertaHoy = true;
       }
-    } else if (diasDiferencia(hoy, fechaPago) <= 7 && fechaPago > hoy) {
+    } else if (!pagado && fechaPago < hoy) {
+      prioridad = 2;
+      clase = "atrasado";
+    } else if (!pagado && diasDiferencia(hoy, fechaPago) <= 7 && fechaPago > hoy) {
       prioridad = 3;
       clase = "porVencer";
+    } else if (pagado && esDelMes(fechaPago, hoy)) {
+      prioridad = 4;
+      clase = "pagado";
+    } else {
+      prioridad = 5;
+      clase = "pendiente";
     }
 
     return { ...cuota, prioridad, clase };
