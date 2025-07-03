@@ -1,64 +1,163 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const params = new URLSearchParams(window.location.search);
-  const cuotaId = params.get("cuotaId");
-  document.getElementById("cuotaId").value = cuotaId;
+// Obtener el ID de la cuota desde la URL
+  const cuotaId = new URLSearchParams(window.location.search).get('cuotaId');
+  let restante = 0;
 
-  const form = document.getElementById("formPago");
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const pagos = [];
+  // Elementos del DOM
+  const lblMontoTotal = document.getElementById('montoTotal');
+  const lblRestante = document.getElementById('restante');
 
-    const efectivo = document.getElementById("efectivo");
-    if (efectivo.checked) {
-      pagos.push({
-        metodoPago: "EFECTIVO",
-        monto: parseFloat(document.getElementById("montoEfectivo").value),
-        comprobanteUrl: "https://mi-cdn.com/efectivo.jpg"
-      });
-    }
+  const efectivoCheck = document.getElementById('efectivoCheck');
+  const efectivoMonto = document.getElementById('efectivoMonto');
+  const efectivoBtn = document.getElementById('efectivoBtn');
 
-    const yape = document.getElementById("yape");
-    if (yape.checked) {
-      const file = document.getElementById("comprobanteYape").files[0];
-      const imageUrl = file ? await subirACloudinary(file) : "";
-      pagos.push({
-        metodoPago: "YAPE",
-        monto: parseFloat(document.getElementById("montoYape").value),
-        comprobanteUrl: imageUrl
-      });
-    }
+  const yapeCheck = document.getElementById('yapeCheck');
+  const yapeMonto = document.getElementById('yapeMonto');
+  const yapeFile = document.getElementById('yapeFile');
+  const yapeBtn = document.getElementById('yapeBtn');
 
-    const mercado = document.getElementById("mercado");
-    if (mercado.checked) {
-      pagos.push({
-        metodoPago: "MERCADO_PAGO",
-        monto: parseFloat(document.getElementById("montoMercado").value),
-        comprobanteUrl: "https://mi-cdn.com/mercado.jpg"
-      });
-    }
+  const mercadoPagoBtn = document.getElementById('mercadoPagoBtn');
 
-    fetch(`https://backpracticaagile.onrender.com/api/cuotas/${cuotaId}/pago-multiple`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(pagos)
+  // Cargar información de la cuota y el restante
+  Promise.all([
+  fetch(`https://backpracticaagile.onrender.com/api/cuotas/detalle/${cuotaId}`)
+    .then(response => {
+      if (!response.ok) throw new Error("Error al obtener detalle de la cuota");
+      return response.json();
+    }),
+  fetch(`https://backpracticaagile.onrender.com/api/cuotas/restante/${cuotaId}`)
+    .then(response => {
+      if (!response.ok) throw new Error("Error al obtener el restante de la cuota");
+      return response.text(); // leer como texto para evitar error JSON si devuelve un número puro
     })
-      .then(res => res.text())
-      .then(msg => {
-        alert(msg);
-        window.location.href = "index.html";
-      })
-      .catch(err => alert("Error en el pago"));
+])
+.then(([cuota, restanteTexto]) => {
+  if (!cuota || typeof cuota.monto !== "number") {
+    console.error("❌ Datos de cuota inválidos:", cuota);
+    return alert("No se pudo cargar la información de la cuota.");
+  }
+
+  const total = cuota.monto;
+  restante = parseFloat(restanteTexto);
+
+  if (isNaN(restante)) {
+    console.error("❌ El restante recibido no es un número válido:", restanteTexto);
+    return alert("Error al procesar el restante de la cuota.");
+  }
+
+  lblMontoTotal.textContent = total.toFixed(2);
+  lblRestante.textContent = restante.toFixed(2);
+})
+.catch(error => {
+  console.error("⚠️ Error al obtener datos:", error);
+  alert("Error al cargar los datos de la cuota.");
+});
+
+
+  // Habilitar campos de efectivo
+  efectivoCheck.addEventListener('change', () => {
+    const enabled = efectivoCheck.checked;
+    efectivoMonto.disabled = !enabled;
+    efectivoBtn.disabled = !enabled;
   });
 
-  async function subirACloudinary(file) {
-    const data = new FormData();
-    data.append("file", file);
-    data.append("upload_preset", "preset-publico");
-    const res = await fetch("https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload", {
-      method: "POST",
-      body: data
-    });
-    const json = await res.json();
-    return json.secure_url;
+  // Habilitar campos de yape
+  yapeCheck.addEventListener('change', () => {
+    const enabled = yapeCheck.checked;
+    yapeMonto.disabled = !enabled;
+    yapeFile.disabled = !enabled;
+    yapeBtn.disabled = !enabled;
+  });
+
+  // Actualizar el restante en la vista
+  function restar(monto) {
+    restante -= monto;
+    if (restante < 0) restante = 0;
+    lblRestante.textContent = restante.toFixed(2);
   }
-});
+
+  // Registrar pago en efectivo
+  efectivoBtn.addEventListener('click', () => {
+    const monto = parseFloat(efectivoMonto.value);
+    if (!monto || monto <= 0 || monto > restante) {
+      return alert('Monto inválido para efectivo.');
+    }
+
+    const form = new FormData();
+    form.append('cuotaId', cuotaId);
+    form.append('metodo', 'EFECTIVO');
+    form.append('monto', monto);
+
+    fetch('https://backpracticaagile.onrender.com/api/pagos/parcial', {
+      method: 'POST',
+      body: form
+    })
+    .then(r => r.ok ? r.json() : Promise.reject('Error en pago efectivo'))
+    .then(() => {
+      alert('Pago en efectivo registrado');
+      restar(monto);
+      efectivoMonto.value = '';
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Ocurrió un error al registrar el pago en efectivo');
+    });
+  });
+
+  // Registrar pago con Yape
+  yapeBtn.addEventListener('click', () => {
+    const monto = parseFloat(yapeMonto.value);
+    const file = yapeFile.files[0];
+
+    if (!monto || monto <= 0 || monto > restante) {
+      return alert('Monto inválido para Yape.');
+    }
+
+    if (!file) {
+      return alert('Debe adjuntar el comprobante de Yape.');
+    }
+
+    const form = new FormData();
+    form.append('cuotaId', cuotaId);
+    form.append('metodo', 'YAPE');
+    form.append('monto', monto);
+    form.append('comprobante', file);
+
+    fetch('https://backpracticaagile.onrender.com/api/pagos/parcial', {
+      method: 'POST',
+      body: form
+    })
+    .then(r => r.ok ? r.json() : Promise.reject('Error en pago Yape'))
+    .then(() => {
+      alert('Pago con Yape registrado');
+      restar(monto);
+      yapeMonto.value = '';
+      yapeFile.value = '';
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Ocurrió un error al registrar el pago con Yape');
+    });
+  });
+
+  // Generar link de MercadoPago
+  mercadoPagoBtn.addEventListener('click', () => {
+    if (restante <= 0) {
+      return alert('No hay saldo pendiente para pagar.');
+    }
+
+    fetch(`https://backpracticaagile.onrender.com/api/pagos/mercadopago/crear-link?cuotaId=${cuotaId}`, {
+      method: 'POST'
+    })
+    .then(r => r.ok ? r.json() : Promise.reject('Error al crear link de MercadoPago'))
+    .then(data => {
+      if (data.link) {
+        window.open(data.link, '_blank');
+      } else {
+        alert('No se pudo generar el link de MercadoPago.');
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Error al generar el link de pago');
+    });
+  });
