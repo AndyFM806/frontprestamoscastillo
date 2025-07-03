@@ -112,25 +112,39 @@
 
   // Cargar información de la cuota y el restante
   Promise.all([
-    fetch(`https://backpracticaagile.onrender.com/api/cuotas/detalle/${cuotaId}`).then(r => r.json()),
-    fetch(`https://backpracticaagile.onrender.com/api/cuotas/restante/${cuotaId}`).then(r => r.json())
-  ])
-  .then(([cuota, restanteData]) => {
-    if (!cuota || !cuota.monto) {
-      console.error("❌ Datos de cuota inválidos:", cuota);
-      return alert("No se pudo cargar la información de la cuota.");
-    }
+  fetch(`https://backpracticaagile.onrender.com/api/cuotas/detalle/${cuotaId}`)
+    .then(response => {
+      if (!response.ok) throw new Error("Error al obtener detalle de la cuota");
+      return response.json();
+    }),
+  fetch(`https://backpracticaagile.onrender.com/api/cuotas/restante/${cuotaId}`)
+    .then(response => {
+      if (!response.ok) throw new Error("Error al obtener el restante de la cuota");
+      return response.text(); // leer como texto para evitar error JSON si devuelve un número puro
+    })
+])
+.then(([cuota, restanteTexto]) => {
+  if (!cuota || typeof cuota.monto !== "number") {
+    console.error("❌ Datos de cuota inválidos:", cuota);
+    return alert("No se pudo cargar la información de la cuota.");
+  }
 
-    const total = cuota.monto;
-    restante = parseFloat(restanteData);
+  const total = cuota.monto;
+  restante = parseFloat(restanteTexto);
 
-    lblMontoTotal.textContent = total.toFixed(2);
-    lblRestante.textContent = restante.toFixed(2);
-  })
-  .catch(error => {
-    console.error("⚠️ Error al obtener datos:", error);
-    alert("Error al cargar los datos de la cuota.");
-  });
+  if (isNaN(restante)) {
+    console.error("❌ El restante recibido no es un número válido:", restanteTexto);
+    return alert("Error al procesar el restante de la cuota.");
+  }
+
+  lblMontoTotal.textContent = total.toFixed(2);
+  lblRestante.textContent = restante.toFixed(2);
+})
+.catch(error => {
+  console.error("⚠️ Error al obtener datos:", error);
+  alert("Error al cargar los datos de la cuota.");
+});
+
 
   // Habilitar campos de efectivo
   efectivoCheck.addEventListener('change', () => {
