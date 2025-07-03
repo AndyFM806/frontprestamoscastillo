@@ -1,73 +1,95 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const tabla = document.getElementById("tablaCuotas");
-  const filtro = document.getElementById("filtroFecha");
-  const apiUrl = "https://backpracticaagile.onrender.com/api/cuotas/pendientes";
+    const tabla = document.getElementById("tablaCuotas");
+    const filtro = document.getElementById("filtroFecha");
+    const apiUrl = "https://backpracticaagile.onrender.com/api/cuotas/pendientes";
 
-  filtro.addEventListener("change", cargarCuotas);
-  cargarCuotas();
+    filtro.addEventListener("change", cargarCuotas);
+    cargarCuotas();
 
-  function cargarCuotas() {
-    fetch(apiUrl)
-      .then(res => res.json())
-      .then(data => pintarCuotas(data))
-      .catch(err => console.error("Error al cargar cuotas:", err));
-  }
-
-  function pintarCuotas(cuotas) {
-    const hoy = new Date();
-    const tablaHTML = [
-      "<table><tr><th>#</th><th>Cliente</th><th>Fecha</th><th>Monto</th><th>Estado</th><th>Acciones</th></tr>"
-    ];
-
-    const filtro = document.getElementById("filtroFecha").value;
-    cuotas.forEach((cuota, i) => {
-      const fechaPago = new Date(cuota.fechaPago);
-      const dias = Math.floor((fechaPago - hoy) / (1000 * 60 * 60 * 24));
-      let clase = "", estado = "";
-    // Clasificación y estado de la cuota
-    if (cuota.pagado) {
-      clase = "pagado";
-      estado = "Pagado";
-      cuota._orden = 5;
-    } else if (fechaPago.toDateString() === hoy.toDateString()) {
-      clase = "hoy";
-      estado = "Vence Hoy";
-      cuota._orden = 1;
-    } else if (dias >= 0 && dias <= 7) {
-      clase = "semana";
-      estado = "Vence esta semana";
-      cuota._orden = 2;
-    } else if (dias < 0 && fechaPago.getMonth() === hoy.getMonth()) {
-      clase = "atrasada";
-      estado = "Atrasada";
-      cuota._orden = 3;
-    } else {
-      estado = "Pendiente";
-      cuota._orden = 4;
+    function cargarCuotas() {
+        fetch(apiUrl)
+            .then(res => res.json())
+            .then(data => pintarCuotas(data))
+            .catch(err => console.error("Error al cargar cuotas:", err));
     }
 
-      if (filtro === "hoy" && clase !== "hoy") return;
-      if (filtro === "semana" && clase !== "semana") return;
-      if (filtro === "mes" && fechaPago.getMonth() !== hoy.getMonth()) return;
-      if (filtro === "anio" && fechaPago.getFullYear() !== hoy.getFullYear()) return;
+    function pintarCuotas(cuotas) {
+        const hoy = new Date();
+        const tablaHTML = [
+            "<table><tr><th>#</th><th>Cliente</th><th>Fecha</th><th>Monto</th><th>Estado</th><th>Acciones</th></tr>"
+        ];
 
-      tablaHTML.push(
-        `<tr class="${clase}">
-          <td>${i + 1}</td>
-          <td>${cuota.prestamo.cliente.nombre}</td>
-          <td>${cuota.fechaPago}</td>
-          <td>S/ ${cuota.monto}</td>
-          <td>${estado}</td>
-          <td>${cuota.pagado ? "-" : `<button onclick="pagar(${cuota.id})">Pagar</button>`}</td>
-        </tr>`
-      );
-    });
+        const filtro = document.getElementById("filtroFecha").value;
+        // Clasifica y asigna prioridad
+        cuotas.forEach((cuota) => {
+            const fechaPago = new Date(cuota.fechaPago);
+            const dias = Math.floor((fechaPago - hoy) / (1000 * 60 * 60 * 24));
+            let clase = "", estado = "";
+            if (cuota.pagado) {
+                clase = "pagado";
+                estado = "Pagado";
+                cuota._orden = 5;
+            } else if (fechaPago.toDateString() === hoy.toDateString()) {
+                clase = "hoy";
+                estado = "Vence Hoy";
+                cuota._orden = 1;
+            } else if (dias >= 0 && dias <= 7) {
+                clase = "semana";
+                estado = "Vence esta semana";
+                cuota._orden = 2;
+            } else if (dias < 0 && fechaPago.getMonth() === hoy.getMonth()) {
+                clase = "atrasada";
+                estado = "Atrasada";
+                cuota._orden = 3;
+            } else {
+                estado = "Pendiente";
+                cuota._orden = 4;
+            }
+            cuota._clase = clase;
+            cuota._estado = estado;
+            cuota._dias = dias;
+        });
 
-    tablaHTML.push("</table>");
-    tabla.innerHTML = tablaHTML.join("");
-  }
+        // Ordena por prioridad
+        cuotas.sort((a, b) => a._orden - b._orden);
+
+        let contador = 1;
+        cuotas.forEach((cuota) => {
+            const fechaPago = new Date(cuota.fechaPago);
+            const clase = cuota._clase;
+            const estado = cuota._estado;
+
+            if (filtro === "hoy" && clase !== "hoy") return;
+            if (filtro === "semana" && clase !== "semana") return;
+            if (filtro === "mes" && fechaPago.getMonth() !== hoy.getMonth()) return;
+            if (filtro === "anio" && fechaPago.getFullYear() !== hoy.getFullYear()) return;
+
+            let boton = "-";
+            if (!cuota.pagado && clase !== "" && clase !== "pagado") {
+                // Solo cuotas vencidas hoy, esta semana o atrasadas pueden pagar
+                boton = `<button onclick="pagar(${cuota.id})">Pagar</button>`;
+            } else if (!cuota.pagado && clase === "") {
+                // Futuras: botón deshabilitado
+                boton = `<button disabled style="opacity:0.5;cursor:not-allowed;">Pagar</button>`;
+            }
+
+            tablaHTML.push(
+                `<tr class="${clase}">
+                    <td>${contador++}</td>
+                    <td>${cuota.prestamo.cliente.nombre}</td>
+                    <td>${cuota.fechaPago}</td>
+                    <td>S/ ${cuota.monto}</td>
+                    <td>${estado}</td>
+                    <td>${boton}</td>
+                </tr>`
+            );
+        });
+
+        tablaHTML.push("</table>");
+        tabla.innerHTML = tablaHTML.join("");
+    }
 });
 
 function pagar(id) {
-  window.location.href = "pago.html?cuotaId=" + id;
+    window.location.href = "pago.html?cuotaId=" + id;
 }
