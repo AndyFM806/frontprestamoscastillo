@@ -79,6 +79,16 @@ document.getElementById("btnMercadoPago").addEventListener("click", () => {
 });
 
 document.getElementById("btnFinalizar").addEventListener("click", () => {
+  fetch(`${urlBase}/cuotas/comprobantes/cuota/${cuotaId}`)
+    .then(res => res.json())
+    .then(data => {
+      // Puedes usar 'data' si necesitas mostrar el comprobante antes de cerrar la cuota
+      console.log("Comprobante:", data);
+    })
+    .catch(err => {
+      alert("Error al obtener el comprobante.");
+      console.error(err);
+    });
   fetch(`${urlBase}/cuotas/${cuotaId}/cerrar`, { method: "POST" })
     .then(() => {
       alert("🎉 Comprobante generado. Cuota cerrada.");
