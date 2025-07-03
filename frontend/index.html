@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gestión de Cuotas</title>
+  <link rel="stylesheet" href="../css/index.css" />
+</head>
+<body>
+  <h1>Cuotas del Cliente</h1>
+
+  <div class="filtros">
+    <label>Filtrar por:</label>
+    <select id="filtroFecha">
+      <option value="todas">Todas</option>
+      <option value="hoy">Vencen Hoy</option>
+      <option value="semana">Esta Semana</option>
+      <option value="mes">Este Mes</option>
+      <option value="anio">Este Año</option>
+    </select>
+  </div>
+
+  <div id="tablaCuotas"></div>
+
+  <script src="../js/index.js"></script>
+</body>
+</html>

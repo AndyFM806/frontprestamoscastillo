@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pasarela de Pagos</title>
+  <link rel="stylesheet" href="../css/index.css" />
+</head>
+<body>
+  <h2>Pago de Cuota</h2>
+  <form id="formPago">
+    <input type="hidden" id="cuotaId" />
+    <label>Método de Pago:</label><br />
+    <input type="checkbox" id="efectivo" value="EFECTIVO" /> Efectivo<br />
+    <input type="checkbox" id="yape" value="YAPE" /> Yape<br />
+    <input type="checkbox" id="mercado" value="MERCADO_PAGO" /> Mercado Pago<br /><br />
+
+    <label>Monto (efectivo):</label>
+    <input type="number" id="montoEfectivo" /><br />
+
+    <label>Monto (yape):</label>
+    <input type="number" id="montoYape" />
+    <input type="file" id="comprobanteYape" /><br />
+
+    <label>Monto (mercado):</label>
+    <input type="number" id="montoMercado" /><br /><br />
+
+    <button type="submit">Pagar</button>
+  </form>
+
+  <script src="../js/pago.js"></script>
+</body>
+</html>
