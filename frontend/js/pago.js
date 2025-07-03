@@ -141,7 +141,7 @@ mercadoPagoBtn.addEventListener('click', () => {
     return alert('No hay saldo pendiente para pagar.');
   }
 
-  fetch(`https://backpracticaagile.onrender.com/api/pagos/mp/link?cuotaId=${cuotaId}`, {
+  fetch(`https://backpracticaagile.onrender.com/api/pagos/mp/link?cuotaId=${restante}`, {
     method: 'POST'
   })
     .then(r => r.ok ? r.json() : Promise.reject('Error al crear link de MercadoPago'))
