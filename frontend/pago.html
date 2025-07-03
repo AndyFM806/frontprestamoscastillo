@@ -2,31 +2,203 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pasarela de Pagos</title>
-  <link rel="stylesheet" href="../css/index.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    .info-cuota p {
+      font-size: 18px;
+      margin: 5px 0;
+    }
+    .metodo {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      background-color: #fafafa;
+    }
+    .metodo input[type='number'],
+    .metodo input[type='file'] {
+      display: block;
+      margin-top: 8px;
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    .metodo button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .metodo button:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+    }
+  </style>
 </head>
 <body>
-  <h2>Pago de Cuota</h2>
-  <form id="formPago">
-    <input type="hidden" id="cuotaId" />
-    <label>Método de Pago:</label><br />
-    <input type="checkbox" id="efectivo" value="EFECTIVO" /> Efectivo<br />
-    <input type="checkbox" id="yape" value="YAPE" /> Yape<br />
-    <input type="checkbox" id="mercado" value="MERCADO_PAGO" /> Mercado Pago<br /><br />
+  <div class="container">
+    <h1>Pasarela de Pagos</h1>
+    <div class="info-cuota">
+      <p><strong>Monto Total:</strong> S/ <span id="montoTotal">0.00</span></p>
+      <p><strong>Restante:</strong> S/ <span id="restante">0.00</span></p>
+    </div>
 
-    <label>Monto (efectivo):</label>
-    <input type="number" id="montoEfectivo" /><br />
+    <form id="formPagos">
+      <!-- Efectivo -->
+      <div class="metodo">
+        <label><input type="checkbox" id="efectivoCheck"> Pago en Efectivo</label>
+        <input type="number" id="efectivoMonto" placeholder="Monto en efectivo" disabled />
+        <button type="button" id="efectivoBtn" disabled>Generar Comprobante</button>
+      </div>
 
-    <label>Monto (yape):</label>
-    <input type="number" id="montoYape" />
-    <input type="file" id="comprobanteYape" /><br />
+      <!-- Yape -->
+      <div class="metodo">
+        <label><input type="checkbox" id="yapeCheck"> Pago con Yape</label>
+        <input type="number" id="yapeMonto" placeholder="Monto por Yape" disabled />
+        <input type="file" id="yapeFile" disabled />
+        <button type="button" id="yapeBtn" disabled>Generar Comprobante</button>
+      </div>
 
-    <label>Monto (mercado):</label>
-    <input type="number" id="montoMercado" /><br /><br />
+      <!-- MercadoPago -->
+      <div class="metodo">
+        <label><input type="checkbox" checked disabled> Pago en Línea (MercadoPago)</label>
+        <button type="button" id="mercadoPagoBtn">Generar Link MercadoPago</button>
+      </div>
+    </form>
+  </div>
 
-    <button type="submit">Pagar</button>
-  </form>
+  <script>
+    // Parámetros iniciales
+    const cuotaId = new URLSearchParams(window.location.search).get('cuotaId');
+    let restante = 0;
 
-  <script src="../js/pago.js"></script>
+    // Elementos
+    const lblMontoTotal = document.getElementById('montoTotal');
+    const lblRestante = document.getElementById('restante');
+
+    const efectivoCheck = document.getElementById('efectivoCheck');
+    const efectivoMonto = document.getElementById('efectivoMonto');
+    const efectivoBtn = document.getElementById('efectivoBtn');
+
+    const yapeCheck = document.getElementById('yapeCheck');
+    const yapeMonto = document.getElementById('yapeMonto');
+    const yapeFile = document.getElementById('yapeFile');
+    const yapeBtn = document.getElementById('yapeBtn');
+
+    const mercadoPagoBtn = document.getElementById('mercadoPagoBtn');
+
+    // Obtener monto total y restante desde backend
+    fetch(`https://backpracticaagile.onrender.com/api/cuotas/${cuotaId}`)
+      .then(res => res.json())
+      .then(data => {
+        const total = data.montoConInteres || data.monto;
+        restante = data.restante || total;
+        lblMontoTotal.textContent = total.toFixed(2);
+        lblRestante.textContent = restante.toFixed(2);
+      });
+
+    // Efectivo toggle
+    efectivoCheck.addEventListener('change', () => {
+      efectivoMonto.disabled = !efectivoCheck.checked;
+      efectivoBtn.disabled = !efectivoCheck.checked;
+    });
+
+    // Yape toggle
+    yapeCheck.addEventListener('change', () => {
+      const enabled = yapeCheck.checked;
+      yapeMonto.disabled = !enabled;
+      yapeFile.disabled = !enabled;
+      yapeBtn.disabled = !enabled;
+    });
+
+    // Función para actualizar restante en pantalla
+    function restar(monto) {
+      restante -= monto;
+      if (restante < 0) restante = 0;
+      lblRestante.textContent = restante.toFixed(2);
+    }
+
+    // Registrar pago efectivo
+    efectivoBtn.addEventListener('click', () => {
+      const monto = parseFloat(efectivoMonto.value);
+      if (!monto || monto <= 0 || monto > restante) return alert('Monto inválido');
+      const form = new FormData();
+      form.append('cuotaId', cuotaId);
+      form.append('metodo', 'EFECTIVO');
+      form.append('monto', monto);
+
+      fetch('https://backpracticaagile.onrender.com/api/pagos/parcial', {
+        method: 'POST',
+        body: form
+      })
+      .then(r => r.ok ? r.json() : Promise.reject('Error'))
+      .then(() => {
+        alert('Comprobante generado para efectivo');
+        restar(monto);
+        efectivoMonto.value = '';
+      });
+    });
+
+    // Registrar pago yape
+    yapeBtn.addEventListener('click', () => {
+      const monto = parseFloat(yapeMonto.value);
+      const file = yapeFile.files[0];
+      if (!monto || monto <= 0 || monto > restante) return alert('Monto inválido');
+      if (!file) return alert('Debe subir comprobante');
+
+      const form = new FormData();
+      form.append('cuotaId', cuotaId);
+      form.append('metodo', 'YAPE');
+      form.append('monto', monto);
+      form.append('comprobante', file);
+
+      fetch('https://backpracticaagile.onrender.com/api/pagos/parcial', {
+        method: 'POST',
+        body: form
+      })
+      .then(r => r.ok ? r.json() : Promise.reject('Error'))
+      .then(() => {
+        alert('Comprobante generado para Yape');
+        restar(monto);
+        yapeMonto.value = '';
+        yapeFile.value = '';
+      });
+    });
+
+    // MercadoPago generar link
+    mercadoPagoBtn.addEventListener('click', () => {
+      if (restante <= 0) return alert('No hay saldo pendiente');
+      fetch(`https://backpracticaagile.onrender.com/api/pagos/mercadopago/crear-link?cuotaId=${cuotaId}`, {
+        method: 'POST'
+      })
+      .then(r => r.json())
+      .then(data => {
+        window.open(data.link, '_blank');
+      });
+    });
+  </script>
 </body>
 </html>
