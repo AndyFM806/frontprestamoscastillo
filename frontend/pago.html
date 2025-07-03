@@ -112,7 +112,7 @@
 
     // Obtener monto total y restante desde backend
     Promise.all([
-  fetch(`https://backpracticaagile.onrender.com/api/cuotas/${cuotaId}`).then(r => r.json()),
+  fetch(`https://backpracticaagile.onrender.com/api/cuotas/detalle/${cuotaId}`).then(r => r.json()),
   fetch(`https://backpracticaagile.onrender.com/api/cuotas/restante/${cuotaId}`).then(r => r.json())
 ])
 .then(([cuota, restanteData]) => {
