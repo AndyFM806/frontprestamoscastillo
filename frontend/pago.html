@@ -1,42 +1,43 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <title>Pasarela de Pagos - Cuota</title>
   <link rel="stylesheet" href="../css/pago.css">
-  <title>Pasarela de Pagos</title>
 </head>
 <body>
-  <div class="container">
-    <h1>Pasarela de Pagos</h1>
-    <div class="info-cuota">
-      <p><strong>Monto Total:</strong> S/ <span id="montoTotal">0.00</span></p>
-      <p><strong>Restante:</strong> S/ <span id="restante">0.00</span></p>
-    </div>
+  <h2>💰 Pasarela de Pagos - Cuota #<span id="lblNumeroCuota"></span></h2>
 
-    <form id="formPagos">
-      <!-- Efectivo -->
-      <div class="metodo">
-        <label><input type="checkbox" id="efectivoCheck"> Pago en Efectivo</label>
-        <input type="number" id="efectivoMonto" placeholder="Monto en efectivo" disabled />
-        <button type="button" id="efectivoBtn" disabled>Generar Comprobante</button>
-      </div>
-
-      <!-- Yape -->
-      <div class="metodo">
-        <label><input type="checkbox" id="yapeCheck"> Pago con Yape</label>
-        <input type="number" id="yapeMonto" placeholder="Monto por Yape" disabled />
-        <input type="file" id="yapeFile" disabled />
-        <button type="button" id="yapeBtn" disabled>Generar Comprobante</button>
-      </div>
-
-      <!-- MercadoPago -->
-      <div class="metodo">
-        <label><input type="checkbox" checked disabled> Pago en Línea (MercadoPago)</label>
-        <button type="button" id="mercadoPagoBtn">Generar Link MercadoPago</button>
-      </div>
-    </form>
+  <div id="info-cuota">
+    <p><strong>Monto Total:</strong> S/ <span id="lblMontoTotal">0.00</span></p>
+    <p><strong>Restante:</strong> S/ <span id="lblRestante">0.00</span></p>
   </div>
+
+  <form id="form-pago" enctype="multipart/form-data">
+    <input type="hidden" id="cuotaId" value="">
+    
+    <label for="metodo">Método de pago:</label>
+    <select id="metodo" required>
+      <option value="">-- Seleccionar --</option>
+      <option value="EFECTIVO">Efectivo</option>
+      <option value="BILLETERA_DIGITAL">Billetera Digital</option>
+      <option value="MERCADO_PAGO">Mercado Pago</option>
+    </select>
+
+    <label for="monto">Monto:</label>
+    <input type="number" id="monto" step="0.01" required>
+
+    <label for="comprobante">Comprobante (si aplica):</label>
+    <input type="file" id="comprobante">
+
+    <button type="submit">Registrar Pago</button>
+    <button type="button" id="btnMercadoPago">💳 Link de Mercado Pago</button>
+  </form>
+
+  <h3>📄 Pagos Registrados</h3>
+  <ul id="lista-pagos"></ul>
+
+  <button id="btnFinalizar" disabled>✅ Finalizar y Generar Comprobante</button>
 
   <script src="../js/pago.js"></script>
 </body>
