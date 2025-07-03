@@ -111,14 +111,17 @@
     const mercadoPagoBtn = document.getElementById('mercadoPagoBtn');
 
     // Obtener monto total y restante desde backend
-    fetch(`https://backpracticaagile.onrender.com/api/cuotas/${cuotaId}`)
-      .then(res => res.json())
-      .then(data => {
-        const total = data.montoConInteres || data.monto;
-        restante = data.restante || total;
-        lblMontoTotal.textContent = total.toFixed(2);
-        lblRestante.textContent = restante.toFixed(2);
-      });
+    Promise.all([
+  fetch(`https://backpracticaagile.onrender.com/api/cuotas/${cuotaId}`).then(r => r.json()),
+  fetch(`https://backpracticaagile.onrender.com/api/cuotas/restante/${cuotaId}`).then(r => r.json())
+])
+.then(([cuota, restanteData]) => {
+  const total = cuota.monto; // o cuota.montoConInteres si lo calculas ahí
+  restante = parseFloat(restanteData);
+  lblMontoTotal.textContent = total.toFixed(2);
+  lblRestante.textContent = restante.toFixed(2);
+});
+
 
     // Efectivo toggle
     efectivoCheck.addEventListener('change', () => {
