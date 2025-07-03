@@ -24,22 +24,27 @@ document.addEventListener("DOMContentLoaded", function () {
       const fechaPago = new Date(cuota.fechaPago);
       const dias = Math.floor((fechaPago - hoy) / (1000 * 60 * 60 * 24));
       let clase = "", estado = "";
-
-      if (cuota.pagado) {
-        clase = "pagado";
-        estado = "Pagado";
-      } else if (fechaPago.toDateString() === hoy.toDateString()) {
-        clase = "hoy";
-        estado = "Vence Hoy";
-      } else if (dias < 0 && fechaPago.getMonth() === hoy.getMonth()) {
-        clase = "atrasada";
-        estado = "Atrasada";
-      } else if (dias >= 0 && dias <= 7) {
-        clase = "semana";
-        estado = "Vence esta semana";
-      } else {
-        estado = "Pendiente";
-      }
+    // Clasificación y estado de la cuota
+    if (cuota.pagado) {
+      clase = "pagado";
+      estado = "Pagado";
+      cuota._orden = 5;
+    } else if (fechaPago.toDateString() === hoy.toDateString()) {
+      clase = "hoy";
+      estado = "Vence Hoy";
+      cuota._orden = 1;
+    } else if (dias >= 0 && dias <= 7) {
+      clase = "semana";
+      estado = "Vence esta semana";
+      cuota._orden = 2;
+    } else if (dias < 0 && fechaPago.getMonth() === hoy.getMonth()) {
+      clase = "atrasada";
+      estado = "Atrasada";
+      cuota._orden = 3;
+    } else {
+      estado = "Pendiente";
+      cuota._orden = 4;
+    }
 
       if (filtro === "hoy" && clase !== "hoy") return;
       if (filtro === "semana" && clase !== "semana") return;
