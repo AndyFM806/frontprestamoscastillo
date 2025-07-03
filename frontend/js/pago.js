@@ -17,60 +17,43 @@
 
   const mercadoPagoBtn = document.getElementById('mercadoPagoBtn');
 
-  // Cargar información de la cuota y el restante
+// Asegúrate que esta línea esté cerrando todo correctamente antes del Promise.all
+document.addEventListener('DOMContentLoaded', () => {
   Promise.all([
-  fetch(`https://backpracticaagile.onrender.com/api/cuotas/detalle/${cuotaId}`)
-    .then(([cuota, restanteTexto]) => {
-  if (!cuota || typeof cuota.monto !== "number") {
-    // Si cuota.monto no existe, intenta acceder a cuota.cuota.monto
-    if (cuota && cuota.cuota && typeof cuota.cuota.monto === "number") {
-      cuota = cuota.cuota;
-    } else {
+    fetch(`https://backpracticaagile.onrender.com/api/cuotas/detalle/${cuotaId}`)
+      .then(response => {
+        if (!response.ok) throw new Error("Error al obtener detalle de la cuota");
+        return response.json();
+      }),
+    fetch(`https://backpracticaagile.onrender.com/api/cuotas/restante/${cuotaId}`)
+      .then(response => {
+        if (!response.ok) throw new Error("Error al obtener el restante de la cuota");
+        return response.text();
+      })
+  ])
+  .then(([cuota, restanteTexto]) => {
+    if (!cuota || typeof cuota.monto !== "number") {
       console.error("❌ Datos de cuota inválidos:", cuota);
       return alert("No se pudo cargar la información de la cuota.");
     }
-  }
 
-  const total = cuota.monto;
-  restante = parseFloat(restanteTexto);
+    const total = cuota.monto;
+    restante = parseFloat(restanteTexto);
 
-  if (isNaN(restante)) {
-    console.error("❌ El restante recibido no es un número válido:", restanteTexto);
-    return alert("Error al procesar el restante de la cuota.");
-  }
+    if (isNaN(restante)) {
+      console.error("❌ El restante recibido no es un número válido:", restanteTexto);
+      return alert("Error al procesar el restante de la cuota.");
+    }
 
-  lblMontoTotal.textContent = total.toFixed(2);
-  lblRestante.textContent = restante.toFixed(2);
-})
-
-    
-  fetch(`https://backpracticaagile.onrender.com/api/cuotas/restante/${cuotaId}`)
-    .then(response => {
-      if (!response.ok) throw new Error("Error al obtener el restante de la cuota");
-      return response.text(); // leer como texto para evitar error JSON si devuelve un número puro
-    })
-])
-.then(([cuota, restanteTexto]) => {
-  if (!cuota || typeof cuota.monto !== "number") {
-    console.error("❌ Datos de cuota inválidos:", cuota);
-    return alert("No se pudo cargar la información de la cuota.");
-  }
-
-  const total = cuota.monto;
-  restante = parseFloat(restanteTexto);
-
-  if (isNaN(restante)) {
-    console.error("❌ El restante recibido no es un número válido:", restanteTexto);
-    return alert("Error al procesar el restante de la cuota.");
-  }
-
-  lblMontoTotal.textContent = total.toFixed(2);
-  lblRestante.textContent = restante.toFixed(2);
-})
-.catch(error => {
-  console.error("⚠️ Error al obtener datos:", error);
-  alert("Error al cargar los datos de la cuota.");
+    lblMontoTotal.textContent = total.toFixed(2);
+    lblRestante.textContent = restante.toFixed(2);
+  })
+  .catch(error => {
+    console.error("⚠️ Error al obtener datos:", error);
+    alert("Error al cargar los datos de la cuota.");
+  });
 });
+
 
 
   // Habilitar campos de efectivo
