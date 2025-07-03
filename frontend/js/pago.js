@@ -10,7 +10,7 @@ const listaPagos = document.getElementById("lista-pagos");
 function cargarInfoCuota() {
   Promise.all([
     fetch(`${urlBase}/cuotas/detalle/${cuotaId}`).then(r => r.json()),
-    fetch(`${urlBase}/cuotas/restante/${cuotaId}`).then(r => r.json()),
+    fetch(`${urlBase}/cuotas/${cuotaId}/restante`).then(r => r.json()),
     fetch(`${urlBase}/pagos/cuota/${cuotaId}`).then(r => r.json())
   ])
   .then(([cuota, restante, pagos]) => {
