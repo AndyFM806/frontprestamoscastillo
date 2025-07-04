@@ -3,9 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <title>Pasarela de Pagos - Cuota</title>
+  <script>
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      window.location.href = "login.html";
+    }
+  </script>
   <link rel="stylesheet" href="../css/pago.css">
 </head>
 <body>
+<button onclick="window.location.href='index.html'" class="btn-atras">← Atrás</button>
   <h2>💰 Pasarela de Pagos - Cuota #<span id="lblNumeroCuota"></span></h2>
 
   <div id="info-cuota">

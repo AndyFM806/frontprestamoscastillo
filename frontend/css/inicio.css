@@ -121,3 +121,21 @@ button.secondary {
 button:hover {
   opacity: 0.9;
 }
+.btn-cuotas {
+  display: inline-block;
+  background-color: #007bff;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 8px;
+  text-decoration: none;
+  text-align: center;
+  transition: background-color 0.3s ease;
+  margin: 20px;
+}
+
+.btn-cuotas:hover {
+  background-color: #0056b3;
+}
