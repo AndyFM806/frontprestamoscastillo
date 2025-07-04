@@ -152,25 +152,28 @@ document.getElementById("btnFinalizar").addEventListener("click", () => {
     .then(() => {
       alert("🎉 Comprobante generado. Cuota cerrada.");
 
-      fetch(`${urlBase}/cuotas/comprobantes/cuota/${cuotaId}`)
-        .then(response => {
-          if (!response.ok) throw new Error("No se pudo descargar el comprobante.");
-          return response.blob();
-        })
-        .then(blob => {
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = `comprobante_cuota_${cuotaId}.pdf`;
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          window.URL.revokeObjectURL(url);
-        })
-        .catch(err => {
-          alert("Error al descargar el comprobante.");
-          console.error(err);
-        });
+      // Espera 1 segundo para asegurar que el comprobante se guarde antes de descargar
+      setTimeout(() => {
+        fetch(`${urlBase}/cuotas/comprobantes/cuota/${cuotaId}`)
+          .then(response => {
+            if (!response.ok) throw new Error("No se pudo descargar el comprobante.");
+            return response.blob();
+          })
+          .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `comprobante_cuota_${cuotaId}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+          })
+          .catch(err => {
+            alert("Error al descargar el comprobante.");
+            console.error(err);
+          });
+      }, 1000); // espera 1 segundo
 
       cargarInfoCuota();
     })
@@ -179,6 +182,7 @@ document.getElementById("btnFinalizar").addEventListener("click", () => {
       console.error(err);
     });
 });
+
 
 
 // Webhook confirmación desde Mercado Pago
