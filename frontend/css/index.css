@@ -64,3 +64,8 @@ tr.hoy {
 .btn-atras:hover {
   background-color: #ddd;
 }
+tr.muy-atrasada {
+  background-color: #d9534f;
+  color: white;
+  font-weight: bold;
+}

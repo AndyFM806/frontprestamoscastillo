@@ -43,14 +43,19 @@ document.addEventListener("DOMContentLoaded", function () {
             clase = "semana";
             estado = "Vence esta semana";
             cuota._orden = 2;
-        } else if (dias < 0 && fechaPago.getMonth() === hoy.getMonth()) {
+        } else if (fechaPago < hoy && fechaPago.getMonth() === hoy.getMonth() && fechaPago.getFullYear() === hoy.getFullYear()) {
             clase = "atrasada";
             estado = "Atrasada";
             cuota._orden = 3;
+        } else if (fechaPago < hoy) {
+            clase = "muy-atrasada";
+            estado = "Atrasada de Meses Anteriores";
+            cuota._orden = 3.5;
         } else {
             estado = "Pendiente";
             cuota._orden = 4;
         }
+
 
         cuota._clase = clase;
         cuota._estado = estado;
