@@ -69,7 +69,7 @@ function cargarInfoCuota() {
     });
 
     // Botón finalizar
-    document.getElementById("btnFinalizar").disabled = parseFloat(restante) > 0;
+    document.getElementById("btnFinalizar").disabled = parseFloat(restante) > 0.1;
 
     actualizarInterfazPago(parseFloat(restante));
   })
@@ -84,9 +84,18 @@ document.getElementById("form-pago").addEventListener("submit", e => {
   e.preventDefault();
 
   const metodo = document.getElementById("metodo").value;
-  const monto = parseFloat(document.getElementById("monto").value);
+  let monto = parseFloat(document.getElementById("monto").value);
   const file = document.getElementById("comprobante").files[0];
 
+if (metodo === "EFECTIVO") {
+  const centavos = monto * 100 % 10;
+  if (centavos < 5) {
+    monto = Math.floor(monto * 10) / 10;
+  } else {
+    monto = Math.ceil(monto * 10) / 10;
+  }
+  monto = parseFloat(monto.toFixed(2));
+}
   if (!monto || monto <= 0) {
     alert("⚠️ Debes ingresar un monto válido.");
     return;
