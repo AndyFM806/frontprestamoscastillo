@@ -46,7 +46,7 @@ function cargarInfoCuota() {
       listaPagos.appendChild(li);
     });
 
-    // Agrega eventos a los botones eliminar (❌)
+    // Agrega eventos a los botones eliminar
     document.querySelectorAll(".btn-eliminar").forEach(btn => {
       btn.addEventListener("click", () => {
         const pagoId = btn.getAttribute("data-id");
@@ -56,7 +56,7 @@ function cargarInfoCuota() {
           })
           .then(() => {
             alert("✅ Pago eliminado correctamente.");
-            cargarInfoCuota(); // Refresca todo
+            cargarInfoCuota();
           })
           .catch(err => {
             alert("❌ Error al eliminar el pago.");
@@ -66,14 +66,15 @@ function cargarInfoCuota() {
       });
     });
 
-    // Habilitar o deshabilitar botón finalizar
+    // Botón finalizar
     document.getElementById("btnFinalizar").disabled = parseFloat(restante) > 0;
+
+    actualizarInterfazPago(parseFloat(restante));
   })
   .catch(err => {
     alert("Error al cargar la información de la cuota.");
     console.error(err);
   });
-  actualizarInterfazPago(parseFloat(restante));
 }
 
 
@@ -81,8 +82,18 @@ document.getElementById("form-pago").addEventListener("submit", e => {
   e.preventDefault();
 
   const metodo = document.getElementById("metodo").value;
-  const monto = document.getElementById("monto").value;
+  const monto = parseFloat(document.getElementById("monto").value);
   const file = document.getElementById("comprobante").files[0];
+
+  if (!monto || monto <= 0) {
+    alert("⚠️ Debes ingresar un monto válido.");
+    return;
+  }
+
+  if (metodo === "BILLETERA_DIGITAL" && !file) {
+    alert("⚠️ Debes subir un comprobante para billetera digital.");
+    return;
+  }
 
   const formData = new FormData();
   formData.append("cuotaId", cuotaId);
@@ -106,33 +117,40 @@ document.getElementById("form-pago").addEventListener("submit", e => {
   });
 });
 
+
 document.getElementById("btnMercadoPago").addEventListener("click", () => {
-  fetch(`${urlBase}/pagos/mp/link?cuotaId=${cuotaId}`, { method: "POST" })
-    .then(res => res.json())
-    .then(data => {
-      if (data.link) {
-        window.open(data.link, "_blank");
-      } else {
-        alert("No se pudo generar el link.");
-      }
-    })
-    .catch(err => {
-      alert("Error al generar el link de Mercado Pago.");
-      console.error(err);
-    });
+  const monto = parseFloat(document.getElementById("monto").value);
+  if (!monto || monto <= 0) {
+    alert("⚠️ Ingresa un monto válido antes de continuar con Mercado Pago.");
+    return;
+  }
+
+  fetch(`${urlBase}/pagos/mp/link?cuotaId=${cuotaId}&monto=${monto}`, {
+    method: "POST"
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.link) {
+      window.open(data.link, "_blank");
+    } else {
+      alert("No se pudo generar el link.");
+    }
+  })
+  .catch(err => {
+    alert("Error al generar el link de Mercado Pago.");
+    console.error(err);
+  });
 });
+
 
 document.getElementById("btnFinalizar").addEventListener("click", () => {
   fetch(`${urlBase}/cuotas/${cuotaId}/cerrar`, { method: "POST" })
     .then(() => {
       alert("🎉 Comprobante generado. Cuota cerrada.");
 
-      // Ahora descargar el comprobante PDF
       fetch(`${urlBase}/cuotas/comprobantes/cuota/${cuotaId}`)
         .then(response => {
-          if (!response.ok) {
-            throw new Error("No se pudo descargar el comprobante.");
-          }
+          if (!response.ok) throw new Error("No se pudo descargar el comprobante.");
           return response.blob();
         })
         .then(blob => {
@@ -150,7 +168,6 @@ document.getElementById("btnFinalizar").addEventListener("click", () => {
           console.error(err);
         });
 
-      // Recargar información
       cargarInfoCuota();
     })
     .catch(err => {
@@ -160,24 +177,22 @@ document.getElementById("btnFinalizar").addEventListener("click", () => {
 });
 
 
-window.onload = cargarInfoCuota;
-// Verifica si el usuario regresó de Mercado Pago con pago aprobado
+// Webhook confirmación desde Mercado Pago
 const paymentId = new URLSearchParams(window.location.search).get("payment_id");
 const status = new URLSearchParams(window.location.search).get("status");
 
 if (paymentId && status === "approved") {
   alert("✅ Tu pago fue aprobado. Confirmando con el servidor...");
 
-  // Esperamos 3 segundos para que el webhook haya confirmado el pago
   setTimeout(() => {
-    cargarInfoCuota(); // Vuelve a mostrar todos los pagos y actualiza el restante
+    cargarInfoCuota();
     alert("🎉 Pago confirmado y registrado correctamente.");
-
-    // Limpia la URL para evitar múltiples confirmaciones al recargar
     const nuevaUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + `?cuotaId=${cuotaId}`;
     window.history.replaceState({}, document.title, nuevaUrl);
   }, 3000);
 }
+
+
 function actualizarInterfazPago(restante) {
   const metodo = document.getElementById("metodo").value;
   const montoInput = document.getElementById("monto");
@@ -185,32 +200,29 @@ function actualizarInterfazPago(restante) {
   const btnRegistrar = document.querySelector("#form-pago button[type='submit']");
   const btnMercadoPago = document.getElementById("btnMercadoPago");
 
-  // Desactiva todo por defecto
   montoInput.disabled = true;
   fileInput.disabled = true;
   btnRegistrar.disabled = true;
   btnMercadoPago.disabled = true;
 
-  if (parseFloat(restante) === 0) {
-    return; // Ya está saldada, no permitir más pagos
-  }
+  if (parseFloat(restante) === 0) return;
 
   if (metodo === "EFECTIVO") {
-  montoInput.disabled = false;
-  btnRegistrar.disabled = false;
-} else if (metodo === "BILLETERA_DIGITAL") {
-  montoInput.disabled = false;
-  fileInput.disabled = false;
-  btnRegistrar.disabled = false;
-} else if (metodo === "MERCADO_PAGO") {
-  montoInput.disabled = false;
-  btnMercadoPago.disabled = false;
+    montoInput.disabled = false;
+    btnRegistrar.disabled = false;
+  } else if (metodo === "BILLETERA_DIGITAL") {
+    montoInput.disabled = false;
+    fileInput.disabled = false;
+    btnRegistrar.disabled = false;
+  } else if (metodo === "MERCADO_PAGO") {
+    montoInput.disabled = false;
+    btnMercadoPago.disabled = false;
+  }
 }
 
-}
-
-// Escuchar cambio de método
 document.getElementById("metodo").addEventListener("change", () => {
   const restante = parseFloat(document.getElementById("lblRestante").textContent);
   actualizarInterfazPago(restante);
 });
+
+window.onload = cargarInfoCuota;
