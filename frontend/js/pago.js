@@ -19,12 +19,37 @@ function cargarInfoCuota() {
     lblRestante.textContent = parseFloat(restante).toFixed(2);
 
     listaPagos.innerHTML = "";
+
     pagos.forEach(pago => {
       const li = document.createElement("li");
-      li.textContent = `${pago.metodoPago}: S/ ${pago.monto}`;
+      li.innerHTML = `
+        ${pago.metodoPago}: S/ ${pago.monto.toFixed(2)}
+        <button class="btn-eliminar" data-id="${pago.id}" style="margin-left:10px; color:red;">❌</button>
+      `;
       listaPagos.appendChild(li);
     });
 
+    // Agrega eventos a los botones eliminar (❌)
+    document.querySelectorAll(".btn-eliminar").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const pagoId = btn.getAttribute("data-id");
+        if (confirm("¿Estás seguro de eliminar este pago?")) {
+          fetch(`${urlBase}/pagos/parcial/${pagoId}`, {
+            method: "DELETE"
+          })
+          .then(() => {
+            alert("✅ Pago eliminado correctamente.");
+            cargarInfoCuota(); // Refresca todo
+          })
+          .catch(err => {
+            alert("❌ Error al eliminar el pago.");
+            console.error(err);
+          });
+        }
+      });
+    });
+
+    // Habilitar o deshabilitar botón finalizar
     document.getElementById("btnFinalizar").disabled = parseFloat(restante) > 0;
   })
   .catch(err => {
@@ -32,6 +57,7 @@ function cargarInfoCuota() {
     console.error(err);
   });
 }
+
 
 document.getElementById("form-pago").addEventListener("submit", e => {
   e.preventDefault();
@@ -84,7 +110,7 @@ document.getElementById("btnFinalizar").addEventListener("click", () => {
       alert("🎉 Comprobante generado. Cuota cerrada.");
 
       // Ahora descargar el comprobante PDF
-      fetch(`${urlBase}/comprobantes/cuota/${cuotaId}`)
+      fetch(`${urlBase}/cuotas/comprobantes/cuota/${cuotaId}`)
         .then(response => {
           if (!response.ok) {
             throw new Error("No se pudo descargar el comprobante.");
