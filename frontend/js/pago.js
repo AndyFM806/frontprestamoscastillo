@@ -119,13 +119,14 @@ document.getElementById("form-pago").addEventListener("submit", e => {
 
 
 document.getElementById("btnMercadoPago").addEventListener("click", () => {
-  const monto = parseFloat(document.getElementById("monto").value);
-  if (!monto || monto <= 0) {
-    alert("⚠️ Ingresa un monto válido antes de continuar con Mercado Pago.");
+  const restante = parseFloat(document.getElementById("lblRestante").textContent);
+
+  if (!restante || restante <= 0) {
+    alert("⚠️ No hay monto pendiente para pagar con Mercado Pago.");
     return;
   }
 
-  fetch(`${urlBase}/pagos/mp/link?cuotaId=${cuotaId}&monto=${monto}`, {
+  fetch(`${urlBase}/pagos/mp/link?cuotaId=${cuotaId}&monto=${restante}`, {
     method: "POST"
   })
   .then(res => res.json())
@@ -141,6 +142,7 @@ document.getElementById("btnMercadoPago").addEventListener("click", () => {
     console.error(err);
   });
 });
+
 
 
 document.getElementById("btnFinalizar").addEventListener("click", () => {
@@ -215,7 +217,7 @@ function actualizarInterfazPago(restante) {
     fileInput.disabled = false;
     btnRegistrar.disabled = false;
   } else if (metodo === "MERCADO_PAGO") {
-    montoInput.disabled = false;
+    montoInput.disabled = true;
     btnMercadoPago.disabled = false;
   }
 }
