@@ -188,13 +188,25 @@ const status = new URLSearchParams(window.location.search).get("status");
 if (paymentId && status === "approved") {
   alert("✅ Tu pago fue aprobado. Confirmando con el servidor...");
 
-  setTimeout(() => {
+  fetch(`${urlBase}/pagos/mp/confirmar?payment_id=${paymentId}&cuotaId=${cuotaId}`, {
+    method: "POST"
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("Error al confirmar el pago en backend.");
+    return res.text();
+  })
+  .then(msg => {
+    alert("🎉 " + msg);
     cargarInfoCuota();
-    alert("🎉 Pago confirmado y registrado correctamente.");
     const nuevaUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + `?cuotaId=${cuotaId}`;
     window.history.replaceState({}, document.title, nuevaUrl);
-  }, 3000);
+  })
+  .catch(err => {
+    alert("⚠️ Hubo un problema al confirmar el pago.");
+    console.error(err);
+  });
 }
+
 
 
 function actualizarInterfazPago(restante) {
