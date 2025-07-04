@@ -26,7 +26,7 @@ tr.pagado {
   color: #999;
 }
 
-tr.atrasada {
+tr.muy-atrasada {
   background-color: #ffdddd;
   color: #b30000;
 }
@@ -64,7 +64,7 @@ tr.hoy {
 .btn-atras:hover {
   background-color: #ddd;
 }
-tr.muy-atrasada {
+tr.atrasada {
   background-color: #d9534f;
   color: white;
   font-weight: bold;
