@@ -84,18 +84,9 @@ document.getElementById("form-pago").addEventListener("submit", e => {
   e.preventDefault();
 
   const metodo = document.getElementById("metodo").value;
-  let monto = parseFloat(document.getElementById("monto").value);
+  const monto = parseFloat(document.getElementById("monto").value);
   const file = document.getElementById("comprobante").files[0];
 
-if (metodo === "EFECTIVO") {
-  const centavos = monto * 100 % 10;
-  if (centavos < 5) {
-    monto = Math.floor(monto * 10) / 10;
-  } else {
-    monto = Math.ceil(monto * 10) / 10;
-  }
-  monto = parseFloat(monto.toFixed(2));
-}
   if (!monto || monto <= 0) {
     alert("⚠️ Debes ingresar un monto válido.");
     return;
