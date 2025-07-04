@@ -73,6 +73,7 @@ function cargarInfoCuota() {
     alert("Error al cargar la información de la cuota.");
     console.error(err);
   });
+  actualizarInterfazPago(restante);
 }
 
 
@@ -160,3 +161,55 @@ document.getElementById("btnFinalizar").addEventListener("click", () => {
 
 
 window.onload = cargarInfoCuota;
+// Verifica si el usuario regresó de Mercado Pago con pago aprobado
+const paymentId = new URLSearchParams(window.location.search).get("payment_id");
+const status = new URLSearchParams(window.location.search).get("status");
+
+if (paymentId && status === "approved") {
+  alert("✅ Tu pago fue aprobado. Confirmando con el servidor...");
+
+  // Esperamos 3 segundos para que el webhook haya confirmado el pago
+  setTimeout(() => {
+    cargarInfoCuota(); // Vuelve a mostrar todos los pagos y actualiza el restante
+    alert("🎉 Pago confirmado y registrado correctamente.");
+
+    // Limpia la URL para evitar múltiples confirmaciones al recargar
+    const nuevaUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + `?cuotaId=${cuotaId}`;
+    window.history.replaceState({}, document.title, nuevaUrl);
+  }, 3000);
+}
+function actualizarInterfazPago(restante) {
+  const metodo = document.getElementById("metodo").value;
+  const montoInput = document.getElementById("monto");
+  const fileInput = document.getElementById("comprobante");
+  const btnRegistrar = document.querySelector("#form-pago button[type='submit']");
+  const btnMercadoPago = document.getElementById("btnMercadoPago");
+
+  // Desactiva todo por defecto
+  montoInput.disabled = true;
+  fileInput.disabled = true;
+  btnRegistrar.disabled = true;
+  btnMercadoPago.disabled = true;
+
+  if (parseFloat(restante) === 0) {
+    return; // Ya está saldada, no permitir más pagos
+  }
+
+  if (metodo === "EFECTIVO") {
+    montoInput.disabled = false;
+    btnRegistrar.disabled = false;
+  } else if (metodo === "BILLETERA") {
+    montoInput.disabled = false;
+    fileInput.disabled = false;
+    btnRegistrar.disabled = false;
+  } else if (metodo === "MERCADOPAGO") {
+    montoInput.disabled = false;
+    btnMercadoPago.disabled = false;
+  }
+}
+
+// Escuchar cambio de método
+document.getElementById("metodo").addEventListener("change", () => {
+  const restante = parseFloat(document.getElementById("lblRestante").textContent);
+  actualizarInterfazPago(restante);
+});
