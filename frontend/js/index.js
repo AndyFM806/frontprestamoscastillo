@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function renderTabla() {
         const tablaHTML = [
-            "<table><tr><th>#</th><th>Cliente</th><th>Fecha</th><th>Monto</th><th>Estado</th><th>Acciones</th></tr>"
+        "<table><tr><th>#</th><th>Cliente</th><th>Fecha</th><th>Monto</th><th>Intereses</th><th>Monto Final</th><th>Estado</th><th>Acciones</th></tr>"
         ];
         const inicio = (paginaActual - 1) * filasPorPagina;
         const fin = inicio + filasPorPagina;
@@ -96,17 +96,18 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             tablaHTML.push(`
-                <tr class="${clase}">
-                    <td>${contador++}</td>
-                    <td>${cuota.prestamo.cliente.nombre}</td>
-                    <td>${cuota.fechaPago}</td>
-                    <td>S/ ${cuota.monto}</td>
-                    <td>${cuota.intereses} días</td>
-                    <td>${cuota.montoFinal}</td>
-                    <td>${estado}</td>
-                    <td>${boton}</td>
-                </tr>
-            `);
+            <tr class="${clase}">
+                <td>${contador++}</td>
+                <td>${cuota.prestamo.cliente.nombre}</td>
+                <td>${cuota.fechaPago}</td>
+                <td>S/ ${parseFloat(cuota.monto).toFixed(2)}</td>
+                <td>S/ ${cuota.intereses ? parseFloat(cuota.intereses).toFixed(2) : "0.00"}</td>
+                <td>S/ ${cuota.montoFinal ? parseFloat(cuota.montoFinal).toFixed(2) : "0.00"}</td>
+                <td>${estado}</td>
+                <td>${boton}</td>
+            </tr>
+        `);
+
         });
 
         tablaHTML.push("</table>");
