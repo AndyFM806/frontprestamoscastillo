@@ -101,6 +101,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     <td>${cuota.prestamo.cliente.nombre}</td>
                     <td>${cuota.fechaPago}</td>
                     <td>S/ ${cuota.monto}</td>
+                    <td>${cuota.intereses} días</td>
+                    <td>${cuota.montoFinal}</td>
                     <td>${estado}</td>
                     <td>${boton}</td>
                 </tr>
