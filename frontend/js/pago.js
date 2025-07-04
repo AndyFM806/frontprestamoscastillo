@@ -86,6 +86,12 @@ document.getElementById("form-pago").addEventListener("submit", e => {
   const metodo = document.getElementById("metodo").value;
   let monto = parseFloat(document.getElementById("monto").value);
   const file = document.getElementById("comprobante").files[0];
+  const restanteActual = parseFloat(document.getElementById("lblRestante").textContent);
+
+if (monto > restanteActual) {
+  alert(`⚠️ No puedes ingresar un monto mayor al restante: S/ ${restanteActual.toFixed(2)}`);
+  return;
+}
 
 if (metodo === "EFECTIVO") {
   const centavos = monto * 100 % 10;
