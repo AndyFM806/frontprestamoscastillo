@@ -151,30 +151,7 @@ document.getElementById("btnFinalizar").addEventListener("click", () => {
   fetch(`${urlBase}/cuotas/${cuotaId}/cerrar`, { method: "POST" })
     .then(() => {
       alert("🎉 Comprobante generado. Cuota cerrada.");
-
-      // Espera 1 segundo para asegurar que el comprobante se guarde antes de descargar
-      setTimeout(() => {
-        fetch(`${urlBase}/cuotas/comprobantes/cuota/${cuotaId}`)
-          .then(response => {
-            if (!response.ok) throw new Error("No se pudo descargar el comprobante.");
-            return response.blob();
-          })
-          .then(blob => {
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `comprobante_cuota_${cuotaId}.pdf`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            window.URL.revokeObjectURL(url);
-          })
-          .catch(err => {
-            alert("Error al descargar el comprobante.");
-            console.error(err);
-          });
-      }, 1000); // espera 1 segundo
-
+      descargarComprobanteConReintento(cuotaId);
       cargarInfoCuota();
     })
     .catch(err => {
@@ -182,6 +159,7 @@ document.getElementById("btnFinalizar").addEventListener("click", () => {
       console.error(err);
     });
 });
+
 
 
 
@@ -250,4 +228,32 @@ if (status === "rejected") {
   alert("❌ Tu pago fue rechazado. No se ha registrado ningún abono.");
   const nuevaUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + `?cuotaId=${cuotaId}`;
   window.history.replaceState({}, document.title, nuevaUrl);
+}
+function descargarComprobanteConReintento(cuotaId, intentos = 5, delayMs = 1000) {
+  if (intentos === 0) {
+    alert("❌ No se pudo descargar el comprobante. Intenta nuevamente.");
+    return;
+  }
+
+  fetch(`${urlBase}/cuotas/comprobantes/cuota/${cuotaId}`)
+    .then(response => {
+      if (!response.ok) throw new Error("No disponible aún");
+      return response.blob();
+    })
+    .then(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `comprobante_cuota_${cuotaId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    })
+    .catch(err => {
+      console.warn(`Intento fallido, reintentando... (${intentos - 1} restantes)`);
+      setTimeout(() => {
+        descargarComprobanteConReintento(cuotaId, intentos - 1, delayMs);
+      }, delayMs);
+    });
 }
