@@ -239,6 +239,16 @@ document.getElementById("metodo").addEventListener("change", () => {
 });
 
 window.onload = cargarInfoCuota;
+document.getElementById("monto").addEventListener("input", () => {
+  const monto = parseFloat(document.getElementById("monto").value);
+  const restante = parseFloat(document.getElementById("lblRestante").textContent);
+
+  if (monto > restante) {
+    document.getElementById("monto").value = restante.toFixed(2);
+    alert("⚠️ No puedes ingresar más del monto restante.");
+  }
+});
+
 if (status === "rejected") {
   alert("❌ Tu pago fue rechazado. No se ha registrado ningún abono.");
   const nuevaUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + `?cuotaId=${cuotaId}`;
