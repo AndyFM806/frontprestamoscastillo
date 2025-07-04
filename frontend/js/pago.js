@@ -87,6 +87,19 @@ document.getElementById("form-pago").addEventListener("submit", e => {
   const monto = parseFloat(document.getElementById("monto").value);
   const file = document.getElementById("comprobante").files[0];
 
+// Si el método es efectivo, redondear a múltiplos de 0.10
+if (metodo === "EFECTIVO") {
+  monto = Math.round(monto * 10) / 10;
+  // Redondeo adicional por monedas: si centavos están entre 0.01 y 0.04 => abajo, 0.05 y 0.09 => arriba
+  const centavos = monto * 100 % 10;
+  if (centavos < 5) {
+    monto = Math.floor(monto * 10) / 10;
+  } else {
+    monto = Math.ceil(monto * 10) / 10;
+  }
+  monto = parseFloat(monto.toFixed(2)); // Asegura 2 decimales
+}
+
   if (!monto || monto <= 0) {
     alert("⚠️ Debes ingresar un monto válido.");
     return;
@@ -249,6 +262,7 @@ function descargarComprobanteConReintento(cuotaId, intentos = 5, delayMs = 1000)
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url);
+      window.location.href = "index.html";
     })
     .catch(err => {
       console.warn(`Intento fallido, reintentando... (${intentos - 1} restantes)`);
