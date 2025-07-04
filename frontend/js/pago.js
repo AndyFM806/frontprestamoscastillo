@@ -73,7 +73,7 @@ function cargarInfoCuota() {
     alert("Error al cargar la información de la cuota.");
     console.error(err);
   });
-  actualizarInterfazPago(restante);
+  actualizarInterfazPago(parseFloat(restante));
 }
 
 
@@ -195,14 +195,14 @@ function actualizarInterfazPago(restante) {
     return; // Ya está saldada, no permitir más pagos
   }
 
-  if (metodo === "EFECTIVO") {
+  if (metodo === "Efectivo") {
     montoInput.disabled = false;
     btnRegistrar.disabled = false;
-  } else if (metodo === "BILLETERA") {
+  } else if (metodo === "Billetera Digital") {
     montoInput.disabled = false;
     fileInput.disabled = false;
     btnRegistrar.disabled = false;
-  } else if (metodo === "MERCADOPAGO") {
+  } else if (metodo === "Mercado Pago") {
     montoInput.disabled = false;
     btnMercadoPago.disabled = false;
   }
