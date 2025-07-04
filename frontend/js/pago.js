@@ -84,22 +84,18 @@ document.getElementById("form-pago").addEventListener("submit", e => {
   e.preventDefault();
 
   const metodo = document.getElementById("metodo").value;
-  const monto = parseFloat(document.getElementById("monto").value);
+  let monto = parseFloat(document.getElementById("monto").value);
   const file = document.getElementById("comprobante").files[0];
 
-// Si el método es efectivo, redondear a múltiplos de 0.10
 if (metodo === "EFECTIVO") {
-  monto = Math.round(monto * 10) / 10;
-  // Redondeo adicional por monedas: si centavos están entre 0.01 y 0.04 => abajo, 0.05 y 0.09 => arriba
   const centavos = monto * 100 % 10;
   if (centavos < 5) {
     monto = Math.floor(monto * 10) / 10;
   } else {
     monto = Math.ceil(monto * 10) / 10;
   }
-  monto = parseFloat(monto.toFixed(2)); // Asegura 2 decimales
+  monto = parseFloat(monto.toFixed(2));
 }
-
   if (!monto || monto <= 0) {
     alert("⚠️ Debes ingresar un monto válido.");
     return;
