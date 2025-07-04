@@ -127,7 +127,17 @@
   const numeroDoc = document.getElementById("numero-doc");
   const btnConsultar = document.getElementById("consultar-btn");
 
-  // Cambiar automáticamente el maxlength del input según tipo seleccionado
+  // Función para validar y habilitar/deshabilitar el botón
+  function validarNumero() {
+    const tipo = tipoDoc.value;
+    const valor = numeroDoc.value.trim();
+    const longitudEsperada = tipo === "DNI" ? 8 : 11;
+
+    // Habilitar si longitud exacta, sino deshabilitar
+    btnConsultar.disabled = valor.length === longitudEsperada ? false : true;
+  }
+
+  // Actualiza maxlength y placeholder según tipo
   tipoDoc.addEventListener("change", () => {
     if (tipoDoc.value === "DNI") {
       numeroDoc.maxLength = 8;
@@ -136,31 +146,19 @@
       numeroDoc.maxLength = 11;
       numeroDoc.placeholder = "Ingrese 11 dígitos";
     }
-    numeroDoc.value = ""; // Limpia si se cambia el tipo
+    numeroDoc.value = "";
+    btnConsultar.disabled = true;
   });
 
-  // Restringe entrada solo a números
+  // Solo permite números y actualiza la validación
   numeroDoc.addEventListener("input", () => {
-    numeroDoc.value = numeroDoc.value.replace(/\D/g, ""); // solo dígitos
+    numeroDoc.value = numeroDoc.value.replace(/\D/g, ""); // elimina no numéricos
+    validarNumero(); // valida longitud correcta
   });
 
-  // Validación al presionar "Consultar"
-  btnConsultar.addEventListener("click", () => {
-    const tipo = tipoDoc.value;
-    const num = numeroDoc.value.trim();
-
-    if ((tipo === "DNI" && num.length !== 8) || (tipo === "RUC" && num.length !== 11)) {
-      alert(`⚠️ El número ingresado debe tener ${tipo === "DNI" ? "8" : "11"} dígitos.`);
-      return;
-    }
-
-    // Aquí puedes continuar con la consulta...
-    console.log("Consulta válida:", tipo, num);
-  });
-
-  // Inicializar restricciones desde el inicio
+  // Inicialización al cargar
   window.addEventListener("DOMContentLoaded", () => {
-    tipoDoc.dispatchEvent(new Event("change"));
+    tipoDoc.dispatchEvent(new Event("change")); // forzar setup inicial
   });
 </script>
 
