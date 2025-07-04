@@ -24,11 +24,25 @@ function cargarInfoCuota() {
       const li = document.createElement("li");
       li.style.display = "flex";
       li.style.alignItems = "center";
-      li.style.gap = "8px";
-      li.innerHTML = `
-      <span>${pago.metodoPago}: S/ ${pago.monto.toFixed(2)}</span>
-      <button class="btn-eliminar" data-id="${pago.id}" style="width:24px; height:24px; display:flex; align-items:center; justify-content:center; color:red; border:none; background:#f8d7da; border-radius:4px; cursor:pointer; font-size:16px; margin-left:4px;">❌</button>
-      `;
+      li.style.justifyContent = "space-between";
+      li.style.padding = "4px 0";
+
+      const span = document.createElement("span");
+      span.textContent = `${pago.metodoPago}: S/ ${pago.monto.toFixed(2)}`;
+
+      const btn = document.createElement("button");
+      btn.className = "btn-eliminar btn-eliminar-clear";
+      btn.setAttribute("data-id", pago.id);
+      btn.textContent = "❌";
+      btn.style.background = "none";
+      btn.style.border = "none";
+      btn.style.color = "red";
+      btn.style.cursor = "pointer";
+      btn.style.fontSize = "1.2em";
+      btn.style.marginLeft = "10px";
+
+      li.appendChild(span);
+      li.appendChild(btn);
       listaPagos.appendChild(li);
     });
 
