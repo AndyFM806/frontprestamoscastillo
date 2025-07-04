@@ -195,17 +195,18 @@ function actualizarInterfazPago(restante) {
     return; // Ya está saldada, no permitir más pagos
   }
 
-  if (metodo === "Efectivo") {
-    montoInput.disabled = false;
-    btnRegistrar.disabled = false;
-  } else if (metodo === "Billetera Digital") {
-    montoInput.disabled = false;
-    fileInput.disabled = false;
-    btnRegistrar.disabled = false;
-  } else if (metodo === "Mercado Pago") {
-    montoInput.disabled = false;
-    btnMercadoPago.disabled = false;
-  }
+  if (metodo === "EFECTIVO") {
+  montoInput.disabled = false;
+  btnRegistrar.disabled = false;
+} else if (metodo === "BILLETERA_DIGITAL") {
+  montoInput.disabled = false;
+  fileInput.disabled = false;
+  btnRegistrar.disabled = false;
+} else if (metodo === "MERCADO_PAGO") {
+  montoInput.disabled = false;
+  btnMercadoPago.disabled = false;
+}
+
 }
 
 // Escuchar cambio de método
