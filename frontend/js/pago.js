@@ -79,19 +79,34 @@ document.getElementById("btnMercadoPago").addEventListener("click", () => {
 });
 
 document.getElementById("btnFinalizar").addEventListener("click", () => {
-  fetch(`${urlBase}/cuotas/comprobantes/cuota/${cuotaId}`)
-    .then(res => res.json())
-    .then(data => {
-      // Puedes usar 'data' si necesitas mostrar el comprobante antes de cerrar la cuota
-      console.log("Comprobante:", data);
-    })
-    .catch(err => {
-      alert("Error al obtener el comprobante.");
-      console.error(err);
-    });
   fetch(`${urlBase}/cuotas/${cuotaId}/cerrar`, { method: "POST" })
     .then(() => {
       alert("🎉 Comprobante generado. Cuota cerrada.");
+
+      // Ahora descargar el comprobante PDF
+      fetch(`${urlBase}/comprobantes/cuota/${cuotaId}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("No se pudo descargar el comprobante.");
+          }
+          return response.blob();
+        })
+        .then(blob => {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `comprobante_cuota_${cuotaId}.pdf`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+        })
+        .catch(err => {
+          alert("Error al descargar el comprobante.");
+          console.error(err);
+        });
+
+      // Recargar información
       cargarInfoCuota();
     })
     .catch(err => {
@@ -99,5 +114,6 @@ document.getElementById("btnFinalizar").addEventListener("click", () => {
       console.error(err);
     });
 });
+
 
 window.onload = cargarInfoCuota;
