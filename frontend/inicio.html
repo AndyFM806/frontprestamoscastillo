@@ -122,6 +122,48 @@
       window.location.href = "login.html";
     });
   </script>
+  <script>
+  const tipoDoc = document.getElementById("tipo-doc");
+  const numeroDoc = document.getElementById("numero-doc");
+  const btnConsultar = document.getElementById("consultar-btn");
+
+  // Cambiar automáticamente el maxlength del input según tipo seleccionado
+  tipoDoc.addEventListener("change", () => {
+    if (tipoDoc.value === "DNI") {
+      numeroDoc.maxLength = 8;
+      numeroDoc.placeholder = "Ingrese 8 dígitos";
+    } else if (tipoDoc.value === "RUC") {
+      numeroDoc.maxLength = 11;
+      numeroDoc.placeholder = "Ingrese 11 dígitos";
+    }
+    numeroDoc.value = ""; // Limpia si se cambia el tipo
+  });
+
+  // Restringe entrada solo a números
+  numeroDoc.addEventListener("input", () => {
+    numeroDoc.value = numeroDoc.value.replace(/\D/g, ""); // solo dígitos
+  });
+
+  // Validación al presionar "Consultar"
+  btnConsultar.addEventListener("click", () => {
+    const tipo = tipoDoc.value;
+    const num = numeroDoc.value.trim();
+
+    if ((tipo === "DNI" && num.length !== 8) || (tipo === "RUC" && num.length !== 11)) {
+      alert(`⚠️ El número ingresado debe tener ${tipo === "DNI" ? "8" : "11"} dígitos.`);
+      return;
+    }
+
+    // Aquí puedes continuar con la consulta...
+    console.log("Consulta válida:", tipo, num);
+  });
+
+  // Inicializar restricciones desde el inicio
+  window.addEventListener("DOMContentLoaded", () => {
+    tipoDoc.dispatchEvent(new Event("change"));
+  });
+</script>
+
 </body>
 
 </body>
