@@ -20,7 +20,9 @@ function cargarInfoCuota() {
 
     listaPagos.innerHTML = "";
 
-    pagos.forEach(pago => {
+  pagos
+    .filter(p => p.estadoPago === "CONFIRMADO")
+    .forEach(pago => {
       const li = document.createElement("li");
       li.style.display = "flex";
       li.style.alignItems = "center";
@@ -228,3 +230,8 @@ document.getElementById("metodo").addEventListener("change", () => {
 });
 
 window.onload = cargarInfoCuota;
+if (status === "rejected") {
+  alert("❌ Tu pago fue rechazado. No se ha registrado ningún abono.");
+  const nuevaUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + `?cuotaId=${cuotaId}`;
+  window.history.replaceState({}, document.title, nuevaUrl);
+}
