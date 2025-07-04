@@ -24,8 +24,14 @@ document.addEventListener("DOMContentLoaded", function () {
             const filtro = document.getElementById("filtroFecha").value;
 
             cuotas.forEach((cuota) => {
-                const fechaPago = new Date(cuota.fechaPago);
-                fechaPago.setHours(0, 0, 0, 0); // ✅ Normaliza también
+                const fechaPagoParts = cuota.fechaPago.split("-");
+                const fechaPago = new Date(
+                    Number(fechaPagoParts[0]),  // Año
+                    Number(fechaPagoParts[1]) - 1,  // Mes (0-indexed)
+                    Number(fechaPagoParts[2])  // Día
+                );
+                fechaPago.setHours(0, 0, 0, 0); // Asegura que esté en medianoche local
+
 
                 const dias = Math.floor((fechaPago - hoy) / (1000 * 60 * 60 * 24));
                 let clase = "", estado = "";
