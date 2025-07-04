@@ -22,9 +22,12 @@ function cargarInfoCuota() {
 
     pagos.forEach(pago => {
       const li = document.createElement("li");
+      li.style.display = "flex";
+      li.style.alignItems = "center";
+      li.style.gap = "8px";
       li.innerHTML = `
-        ${pago.metodoPago}: S/ ${pago.monto.toFixed(2)}
-        <button class="btn-eliminar" data-id="${pago.id}" style="margin-left:10px; color:red;">❌</button>
+      <span>${pago.metodoPago}: S/ ${pago.monto.toFixed(2)}</span>
+      <button class="btn-eliminar" data-id="${pago.id}" style="width:24px; height:24px; display:flex; align-items:center; justify-content:center; color:red; border:none; background:#f8d7da; border-radius:4px; cursor:pointer; font-size:16px; margin-left:4px;">❌</button>
       `;
       listaPagos.appendChild(li);
     });
